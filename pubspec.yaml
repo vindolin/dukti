@@ -37,6 +37,9 @@ dependencies:
   cupertino_icons: ^1.0.6
   bonsoir: ^5.1.10
   file_picker: ^8.1.2
+  device_info_plus: ^11.1.0
+  uuid: ^4.5.1
+  nanoid: ^1.0.0
 
 dev_dependencies:
   flutter_test:
