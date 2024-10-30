@@ -34,7 +34,7 @@ startBroadcast() async {
     type: duktiServiceType,
     port: duktiServicePort,
     attributes: {
-      'DUMMY': 'iOSFix', // see https://github.com/Skyost/Bonsoir/issues/83#issuecomment-2366997280
+      'platform': Platform.operatingSystem,
     },
   );
 
@@ -49,12 +49,12 @@ startBroadcast() async {
 @riverpod
 class DuktiClients extends _$DuktiClients {
   @override
-  Map<String, List<String>> build() {
+  Map<String, Client> build() {
     return {};
   }
 
-  void set(String name, String address, String ip) {
-    state = Map.from(state)..[name] = [address, ip];
+  void set(String name, Client client) {
+    state = Map.from(state)..[name] = Client(name: name, host: client.host, ip: client.ip, platform: client.platform);
   }
 
   void remove(String name) {
@@ -74,22 +74,34 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
   var allEvents = <bonsoir.BonsoirDiscoveryEvent>[];
   if (discovery.eventStream != null) {
     await for (final event in discovery.eventStream!) {
-      print(event.type);
       switch (event.type) {
         case bonsoir.BonsoirDiscoveryEventType.discoveryServiceFound:
-          logger.w('Service found : ${event.service?.name}');
+          logger.i('Service found : ${event.service?.name}');
           event.service?.resolve(discovery.serviceResolver);
           break;
 
         case bonsoir.BonsoirDiscoveryEventType.discoveryServiceResolved:
-          logger.w('Service resolved : ${event.service?.name}');
+          logger.i('Service resolved : ${event.service?.name}');
           final json = event.service?.toJson();
 
           final String? name = event.service?.name;
-          final String? host = json?['service.host'];
           // Add the client to the clients provider
+          final String? host = json?['service.host'];
+
           if (name != null && host != null && name != clientName) {
-            clients.set(name, host, await utils.lookupIP4(host));
+            final platformString = json?['service.attributes']['platform'];
+            final ClientPlatform platform = ClientPlatform.values.firstWhere(
+              (e) => e.name == platformString,
+              orElse: () => ClientPlatform.flutter,
+            );
+
+            Client client = Client(
+              name: name,
+              host: host,
+              ip: await utils.lookupIP4(host),
+              platform: platform,
+            );
+            clients.set(name, client);
           }
 
           // we don't use those directly, use the clients map instead
@@ -98,14 +110,13 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
           break;
 
         case bonsoir.BonsoirDiscoveryEventType.discoveryServiceLost:
-          logger.w('Service lost : ${event.service?.name}');
+          logger.i('Service lost : ${event.service?.name}');
 
           // remove the client from the clients provider
           final String? name = event.service?.name;
           if (name != null) {
             clients.remove(name);
           }
-
           break;
 
         default:

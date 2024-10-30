@@ -7,13 +7,13 @@ part 'client_provider.g.dart';
 
 class Client {
   final String name;
-  final String address;
+  final String host;
   final String ip;
   final ClientPlatform platform;
 
   Client({
     required this.name,
-    required this.address,
+    required this.host,
     required this.ip,
     required this.platform,
   });

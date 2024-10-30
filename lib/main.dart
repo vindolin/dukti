@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'screens/client_screen.dart';
 import 'services/bonjour_service.dart' as bonsoir_service;
+import 'widgets/platform_icon_widget.dart';
 
 /*
   Hot reload sadly does not work with the bonsoir plugin
@@ -79,25 +80,26 @@ class DuktiHome extends ConsumerWidget {
         child: ListView.builder(
           itemCount: clients.length,
           itemBuilder: (context, index) {
-            final client = clients.entries.elementAt(index);
-            final name = client.key;
-            final [host, ip] = client.value;
+            final entry = clients.entries.elementAt(index);
+            final name = entry.key;
+            final client = entry.value;
+
             return ListTile(
-              leading: const Icon(Icons.android),
-              title: Text(client.key),
+              leading: PlatformIcon(platform: client.platform),
+              title: Text(entry.key),
               // subtitle: Text('$ip ($host)'),
               subtitle: RichText(
                   text: TextSpan(
                 children: [
-                  TextSpan(text: ip, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-                  TextSpan(text: ' ($host)', style: const TextStyle(color: Colors.grey)),
+                  TextSpan(text: client.ip, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                  TextSpan(text: ' ($client.host)', style: const TextStyle(color: Colors.grey)),
                 ],
               )),
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ClientScreen(name: name, address: host, ip: ip),
+                    builder: (context) => ClientScreen(name: name, address: client.host, ip: client.ip),
                   ),
                 );
               },

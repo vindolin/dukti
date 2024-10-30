@@ -6,7 +6,7 @@ part of 'bonjour_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$eventsHash() => r'7831ecb807f815a2f1c5108cb78f335f7c83708e';
+String _$eventsHash() => r'016cec6152057a3530d77ab314b93aa181d00c5c';
 
 /// Stream provider that listens to bonsoir events
 ///
@@ -26,14 +26,14 @@ final eventsProvider =
 // ignore: unused_element
 typedef EventsRef
     = AutoDisposeStreamProviderRef<List<bonsoir.BonsoirDiscoveryEvent>>;
-String _$duktiClientsHash() => r'0247929af964b90e47b19bc04dc408a955f7f878';
+String _$duktiClientsHash() => r'b318958911e66c600ea6a197395ee99070be68b9';
 
 ///  Provider that holds the clients discovered by bonsoir
 ///
 /// Copied from [DuktiClients].
 @ProviderFor(DuktiClients)
-final duktiClientsProvider = AutoDisposeNotifierProvider<DuktiClients,
-    Map<String, List<String>>>.internal(
+final duktiClientsProvider =
+    AutoDisposeNotifierProvider<DuktiClients, Map<String, Client>>.internal(
   DuktiClients.new,
   name: r'duktiClientsProvider',
   debugGetCreateSourceHash:
@@ -42,6 +42,6 @@ final duktiClientsProvider = AutoDisposeNotifierProvider<DuktiClients,
   allTransitiveDependencies: null,
 );
 
-typedef _$DuktiClients = AutoDisposeNotifier<Map<String, List<String>>>;
+typedef _$DuktiClients = AutoDisposeNotifier<Map<String, Client>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -22,6 +22,7 @@ dependencies:
   fast_immutable_collections: ^10.2.4
   logger: ^2.4.0
   socket_io: ^1.0.1
+  font_awesome_flutter: ^10.7.0
 
 dev_dependencies:
   flutter_test:
