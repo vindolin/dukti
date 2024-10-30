@@ -12,25 +12,32 @@ import '/utils.dart' as utils;
 part 'bonjour_service.g.dart';
 
 const duktiServiceType = '_dukti._tcp';
+const duktiServicePort = 4645;
+
+String clientName = '';
+
+setClientName() async {
+  String deviceName = await utils.getDeviceName();
+  clientName = 'Dukti_${Platform.operatingSystem}:$deviceName:${nanoid.customAlphabet('1234567890abcdef', 10)}';
+}
 
 /// Start the bonsoir broadcast
 startBroadcast() async {
-  String deviceName = await utils.getDeviceName();
-
   final service = bonsoir.BonsoirService(
-    name:
-        'Dukti_${Platform.operatingSystem}:$deviceName:${nanoid.customAlphabet('1234567890abcdef', 10)}', // Put your service name here.
+    name: clientName,
     type: duktiServiceType,
-    port: 4645,
+    port: duktiServicePort,
   );
 
   bonsoir.BonsoirBroadcast broadcast = bonsoir.BonsoirBroadcast(service: service);
   await broadcast.ready;
   await broadcast.start();
+
+  return broadcast;
 }
 
 ///  Provider that holds the clients discovered by bonsoir
-@riverpod
+@Riverpod(keepAlive: true)
 class DuktiClients extends _$DuktiClients {
   @override
   Map<String, List<String>> build() {
@@ -40,10 +47,15 @@ class DuktiClients extends _$DuktiClients {
   void set(String name, String address, String ip) {
     state = Map.from(state)..[name] = [address, ip];
   }
+
+  void remove(String name) {
+    print(name);
+    state = Map.from(state)..remove(name);
+  }
 }
 
 /// Stream provider that listens to bonsoir events
-@riverpod
+@Riverpod(keepAlive: true)
 Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
   final discovery = bonsoir.BonsoirDiscovery(type: duktiServiceType);
   final clients = ref.read(duktiClientsProvider.notifier);
@@ -53,6 +65,7 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
   var allEvents = <bonsoir.BonsoirDiscoveryEvent>[];
   if (discovery.eventStream != null) {
     await for (final event in discovery.eventStream!) {
+      print(event.type);
       switch (event.type) {
         case bonsoir.BonsoirDiscoveryEventType.discoveryServiceFound:
           print('Service found : ${event.service?.toJson()}');
@@ -66,7 +79,7 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
           final String? name = event.service?.name;
           final String? host = json?['service.host'];
           // Add the client to the clients provider
-          if (name != null && host != null) {
+          if (name != null && host != null && name != clientName) {
             clients.set(name, host, await utils.lookupIP4(host));
           }
 
@@ -77,6 +90,13 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
 
         case bonsoir.BonsoirDiscoveryEventType.discoveryServiceLost:
           print('Service lost : ${event.service?.toJson()}');
+
+          // remove the client from the clients provider
+          final String? name = event.service?.name;
+          if (name != null) {
+            clients.remove(name);
+          }
+
           break;
 
         default:

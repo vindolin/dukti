@@ -1,4 +1,5 @@
 // ignore_for_file: avoid_print
+import 'package:bonsoir/bonsoir.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flutter/material.dart';
@@ -9,7 +10,7 @@ import 'services/bonjour_service.dart' as bonsoir_service;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  bonsoir_service.startBroadcast();
+  await bonsoir_service.setClientName();
 
   runApp(
     const ProviderScope(
@@ -26,9 +27,22 @@ class DuktiApp extends ConsumerStatefulWidget {
 }
 
 class _DuktiAppState extends ConsumerState<DuktiApp> {
+  late final BonsoirBroadcast broadcast;
+
   @override
-  void initState() {
+  initState() {
     super.initState();
+    startBroadcast();
+  }
+
+  void startBroadcast() async {
+    broadcast = await bonsoir_service.startBroadcast();
+  }
+
+  @override
+  void dispose() {
+    broadcast.stop();
+    super.dispose();
   }
 
   @override
@@ -59,28 +73,36 @@ class DuktiHome extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Dukti'),
+        title: Text(bonsoir_service.clientName),
       ),
       body: Center(
         child: ListView.builder(
-            itemCount: clients.length,
-            itemBuilder: (context, index) {
-              final client = clients.entries.elementAt(index);
-              final name = client.key;
-              final [host, ip] = client.value;
-              return ListTile(
-                title: Text(client.key),
-                subtitle: Text('$host - $ip'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ClientPage(name: name, address: host, ip: ip),
-                    ),
-                  );
-                },
-              );
-            }),
+          itemCount: clients.length,
+          itemBuilder: (context, index) {
+            final client = clients.entries.elementAt(index);
+            final name = client.key;
+            final [host, ip] = client.value;
+            return ListTile(
+              title: Text(client.key),
+              // subtitle: Text('$ip ($host)'),
+              subtitle: RichText(
+                  text: TextSpan(
+                children: [
+                  TextSpan(text: ip, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                  TextSpan(text: ' ($host)', style: const TextStyle(color: Colors.grey)),
+                ],
+              )),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ClientScreen(name: name, address: host, ip: ip),
+                  ),
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }

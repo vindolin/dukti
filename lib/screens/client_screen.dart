@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ClientPage extends ConsumerWidget {
+class ClientScreen extends ConsumerWidget {
   final String name;
   final String address;
   final String ip;
 
-  const ClientPage({
+  const ClientScreen({
     super.key,
     required this.name,
     required this.address,
