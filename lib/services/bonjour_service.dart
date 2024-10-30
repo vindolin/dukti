@@ -68,7 +68,6 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
   final discovery = bonsoir.BonsoirDiscovery(type: duktiServiceType);
 
   final clients = ref.read(duktiClientsProvider.notifier);
-  final clientsNew = ref.read(duktiClientsNewProvider.notifier);
   await discovery.ready;
   discovery.start();
 
