@@ -8,12 +8,11 @@ import 'package:nanoid/nanoid.dart' as nanoid;
 import 'package:bonsoir/bonsoir.dart' as bonsoir;
 import 'package:logger/logger.dart';
 
+import '/models/app_constants.dart';
 import '/client_provider.dart';
 import '/utils.dart' as utils;
 
 part 'bonjour_service.g.dart';
-
-enum ClientPlatform { android, ios, macos, windows, linux, flutter }
 
 var logger = Logger();
 

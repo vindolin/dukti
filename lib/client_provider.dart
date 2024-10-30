@@ -1,7 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 
-import '/services/bonjour_service.dart';
+import 'models/app_constants.dart';
 
 part 'client_provider.g.dart';
 
