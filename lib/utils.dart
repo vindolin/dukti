@@ -28,7 +28,13 @@ Future getDeviceName() async {
 lookupIP4(String host) async {
   String ip = '';
   await InternetAddress.lookup(host, type: InternetAddressType.IPv4).then((value) {
-    ip = value.first.address;
+    ip = value
+        .firstWhere(
+          (address) => !address.address.contains(
+            '192.168.56', // filter out the virtualbox ip
+          ),
+        )
+        .address;
   });
   return ip;
 }

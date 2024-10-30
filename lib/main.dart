@@ -1,11 +1,17 @@
 // ignore_for_file: avoid_print
 import 'package:bonsoir/bonsoir.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:flutter/material.dart';
 
 import 'screens/client_screen.dart';
 import 'services/bonjour_service.dart' as bonsoir_service;
+
+/*
+  Hot reload sadly does not work with the bonsoir plugin
+  When hot reload is triggered, the old bonsoir broadcast is not stopped
+  and the old device is still being broadcasted.
+  see: https://stackoverflow.com/questions/69952232/handling-dispose-method-when-using-hot-restart
+*/
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,12 +43,6 @@ class _DuktiAppState extends ConsumerState<DuktiApp> {
 
   void startBroadcast() async {
     broadcast = await bonsoir_service.startBroadcast();
-  }
-
-  @override
-  void dispose() {
-    broadcast.stop();
-    super.dispose();
   }
 
   @override
@@ -83,6 +83,7 @@ class DuktiHome extends ConsumerWidget {
             final name = client.key;
             final [host, ip] = client.value;
             return ListTile(
+              leading: const Icon(Icons.android),
               title: Text(client.key),
               // subtitle: Text('$ip ($host)'),
               subtitle: RichText(
@@ -103,6 +104,11 @@ class DuktiHome extends ConsumerWidget {
             );
           },
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {},
+        tooltip: 'Refresh',
+        child: const Icon(Icons.refresh),
       ),
     );
   }

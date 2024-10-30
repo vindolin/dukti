@@ -6,14 +6,14 @@ part of 'bonjour_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$eventsHash() => r'f2c533592ec8a4a79c7b93cdf8981885e51ce9e0';
+String _$eventsHash() => r'1e00edc6aac976bd7c60a7a6d716204fe7d73ca7';
 
 /// Stream provider that listens to bonsoir events
 ///
 /// Copied from [events].
 @ProviderFor(events)
 final eventsProvider =
-    StreamProvider<List<bonsoir.BonsoirDiscoveryEvent>>.internal(
+    AutoDisposeStreamProvider<List<bonsoir.BonsoirDiscoveryEvent>>.internal(
   events,
   name: r'eventsProvider',
   debugGetCreateSourceHash:
@@ -24,15 +24,16 @@ final eventsProvider =
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef EventsRef = StreamProviderRef<List<bonsoir.BonsoirDiscoveryEvent>>;
-String _$duktiClientsHash() => r'3a3fa67f05bf391e94331c47b97a88c4b11a9abd';
+typedef EventsRef
+    = AutoDisposeStreamProviderRef<List<bonsoir.BonsoirDiscoveryEvent>>;
+String _$duktiClientsHash() => r'0247929af964b90e47b19bc04dc408a955f7f878';
 
 ///  Provider that holds the clients discovered by bonsoir
 ///
 /// Copied from [DuktiClients].
 @ProviderFor(DuktiClients)
-final duktiClientsProvider =
-    NotifierProvider<DuktiClients, Map<String, List<String>>>.internal(
+final duktiClientsProvider = AutoDisposeNotifierProvider<DuktiClients,
+    Map<String, List<String>>>.internal(
   DuktiClients.new,
   name: r'duktiClientsProvider',
   debugGetCreateSourceHash:
@@ -41,6 +42,6 @@ final duktiClientsProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$DuktiClients = Notifier<Map<String, List<String>>>;
+typedef _$DuktiClients = AutoDisposeNotifier<Map<String, List<String>>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

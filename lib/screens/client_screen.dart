@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
+// import 'package:socket_io/socket_io.dart';
 
 class ClientScreen extends ConsumerWidget {
   final String name;
@@ -28,6 +30,15 @@ class ClientScreen extends ConsumerWidget {
             Text('IP: $ip'),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          await Clipboard.getData('text/plain').then((value) {
+            // open a socket to $ip and transfer the value
+          });
+        },
+        tooltip: 'paste',
+        child: const Icon(Icons.paste),
       ),
     );
   }

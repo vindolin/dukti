@@ -3,13 +3,19 @@
 import 'dart:io' show Platform;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:nanoid/nanoid.dart' as nanoid;
 import 'package:bonsoir/bonsoir.dart' as bonsoir;
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:logger/logger.dart';
 
+import '/client_provider.dart';
 import '/utils.dart' as utils;
 
 part 'bonjour_service.g.dart';
+
+enum ClientPlatform { android, ios, macos, windows, linux, flutter }
+
+var logger = Logger();
 
 const duktiServiceType = '_dukti._tcp';
 const duktiServicePort = 4645;
@@ -18,7 +24,7 @@ String clientName = '';
 
 setClientName() async {
   String deviceName = await utils.getDeviceName();
-  clientName = 'Dukti_${Platform.operatingSystem}:$deviceName:${nanoid.customAlphabet('1234567890abcdef', 10)}';
+  clientName = 'Dukti:${Platform.operatingSystem}:$deviceName:${nanoid.customAlphabet('1234567890abcdef', 8)}';
 }
 
 /// Start the bonsoir broadcast
@@ -27,6 +33,9 @@ startBroadcast() async {
     name: clientName,
     type: duktiServiceType,
     port: duktiServicePort,
+    attributes: {
+      'DUMMY': 'iOSFix', // see https://github.com/Skyost/Bonsoir/issues/83#issuecomment-2366997280
+    },
   );
 
   bonsoir.BonsoirBroadcast broadcast = bonsoir.BonsoirBroadcast(service: service);
@@ -37,7 +46,7 @@ startBroadcast() async {
 }
 
 ///  Provider that holds the clients discovered by bonsoir
-@Riverpod(keepAlive: true)
+@riverpod
 class DuktiClients extends _$DuktiClients {
   @override
   Map<String, List<String>> build() {
@@ -49,16 +58,17 @@ class DuktiClients extends _$DuktiClients {
   }
 
   void remove(String name) {
-    print(name);
     state = Map.from(state)..remove(name);
   }
 }
 
 /// Stream provider that listens to bonsoir events
-@Riverpod(keepAlive: true)
+@riverpod
 Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
   final discovery = bonsoir.BonsoirDiscovery(type: duktiServiceType);
+
   final clients = ref.read(duktiClientsProvider.notifier);
+  final clientsNew = ref.read(duktiClientsNewProvider.notifier);
   await discovery.ready;
   discovery.start();
 
@@ -68,12 +78,12 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
       print(event.type);
       switch (event.type) {
         case bonsoir.BonsoirDiscoveryEventType.discoveryServiceFound:
-          print('Service found : ${event.service?.toJson()}');
+          logger.w('Service found : ${event.service?.name}');
           event.service?.resolve(discovery.serviceResolver);
           break;
 
         case bonsoir.BonsoirDiscoveryEventType.discoveryServiceResolved:
-          print('Service resolved : ${event.service?.toJson()}');
+          logger.w('Service resolved : ${event.service?.name}');
           final json = event.service?.toJson();
 
           final String? name = event.service?.name;
@@ -89,7 +99,7 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
           break;
 
         case bonsoir.BonsoirDiscoveryEventType.discoveryServiceLost:
-          print('Service lost : ${event.service?.toJson()}');
+          logger.w('Service lost : ${event.service?.name}');
 
           // remove the client from the clients provider
           final String? name = event.service?.name;

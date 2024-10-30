@@ -1,12 +1,22 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 
+import '/services/bonjour_service.dart';
+
 part 'client_provider.g.dart';
 
 class Client {
   final String name;
   final String address;
-  Client(this.name, this.address);
+  final String ip;
+  final ClientPlatform platform;
+
+  Client({
+    required this.name,
+    required this.address,
+    required this.ip,
+    required this.platform,
+  });
 }
 
 @Riverpod(keepAlive: true)
