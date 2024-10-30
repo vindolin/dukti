@@ -1,6 +1,6 @@
 // ignore_for_file: avoid_print
 
-import 'dart:io' show InternetAddress, InternetAddressType, Platform;
+import 'dart:io' show Platform;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nanoid/nanoid.dart' as nanoid;
@@ -13,6 +13,7 @@ part 'bonjour_service.g.dart';
 
 const duktiServiceType = '_dukti._tcp';
 
+/// Start the bonsoir broadcast
 startBroadcast() async {
   String deviceName = await utils.getDeviceName();
 
@@ -28,6 +29,7 @@ startBroadcast() async {
   await broadcast.start();
 }
 
+///  Provider that holds the clients discovered by bonsoir
 @riverpod
 class DuktiClients extends _$DuktiClients {
   @override
@@ -40,14 +42,7 @@ class DuktiClients extends _$DuktiClients {
   }
 }
 
-lookupIP4(String host) async {
-  String ip = '';
-  await InternetAddress.lookup(host, type: InternetAddressType.IPv4).then((value) {
-    ip = value.first.address;
-  });
-  return ip;
-}
-
+/// Stream provider that listens to bonsoir events
 @riverpod
 Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
   final discovery = bonsoir.BonsoirDiscovery(type: duktiServiceType);
@@ -70,9 +65,9 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
 
           final String? name = event.service?.name;
           final String? host = json?['service.host'];
-          // Add the client to the list of clients
+          // Add the client to the clients provider
           if (name != null && host != null) {
-            clients.set(name, host, await lookupIP4(host));
+            clients.set(name, host, await utils.lookupIP4(host));
           }
 
           // we don't use those directly, use the clients map instead

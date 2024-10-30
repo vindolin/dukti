@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flutter/material.dart';
 
+import 'screens/client_screen.dart';
 import 'services/bonjour_service.dart' as bonsoir_service;
 
 void main() async {
@@ -32,7 +33,7 @@ class _DuktiAppState extends ConsumerState<DuktiApp> {
 
   @override
   Widget build(BuildContext context) {
-    ref.read(bonsoir_service.duktiClientsProvider);
+    ref.watch(bonsoir_service.eventsProvider); // start listening to events
 
     return MaterialApp(
       title: 'Dukti',
@@ -52,35 +53,34 @@ class DuktiHome extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(bonsoir_service.eventsProvider);
-    final clients = ref.watch(bonsoir_service.duktiClientsProvider);
+    final clients =
+        ref.watch(bonsoir_service.duktiClientsProvider); // clients are dependent on the events provider further up
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('meep'),
+        title: const Text('Dukti'),
       ),
       body: Center(
         child: ListView.builder(
             itemCount: clients.length,
             itemBuilder: (context, index) {
               final client = clients.entries.elementAt(index);
+              final name = client.key;
+              final [host, ip] = client.value;
               return ListTile(
                 title: Text(client.key),
-                subtitle: Text('${client.value[0]} - ${client.value[1]}'),
+                subtitle: Text('$host - $ip'),
                 onTap: () {
-                  print(client);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ClientPage(name: name, address: host, ip: ip),
+                    ),
+                  );
                 },
               );
             }),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          // print(bonsoirProvider);
-          // print(bonsoirServiceX.clients);
-        },
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }

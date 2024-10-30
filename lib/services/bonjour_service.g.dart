@@ -6,9 +6,11 @@ part of 'bonjour_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$eventsHash() => r'aaac32a779858ef918eae606ca917574b653eae9';
+String _$eventsHash() => r'1bf6b0771eca0eff57143fcd254f75fd98498637';
 
-/// See also [events].
+/// Stream provider that listens to bonsoir events
+///
+/// Copied from [events].
 @ProviderFor(events)
 final eventsProvider =
     AutoDisposeStreamProvider<List<bonsoir.BonsoirDiscoveryEvent>>.internal(
@@ -26,7 +28,9 @@ typedef EventsRef
     = AutoDisposeStreamProviderRef<List<bonsoir.BonsoirDiscoveryEvent>>;
 String _$duktiClientsHash() => r'd9bb1b928a05ca8fe9f7ab79e495d2a7a1287063';
 
-/// See also [DuktiClients].
+///  Provider that holds the clients discovered by bonsoir
+///
+/// Copied from [DuktiClients].
 @ProviderFor(DuktiClients)
 final duktiClientsProvider = AutoDisposeNotifierProvider<DuktiClients,
     Map<String, List<String>>>.internal(

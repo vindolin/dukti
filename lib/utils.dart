@@ -1,5 +1,7 @@
-import 'dart:io' show Platform;
+import 'dart:io' show InternetAddress, InternetAddressType, Platform;
 import 'package:device_info_plus/device_info_plus.dart';
+
+//TODO: utils is temporary, move contents to a separate files
 
 Future getDeviceName() async {
   // get the device name
@@ -21,4 +23,12 @@ Future getDeviceName() async {
   }
 
   return name;
+}
+
+lookupIP4(String host) async {
+  String ip = '';
+  await InternetAddress.lookup(host, type: InternetAddressType.IPv4).then((value) {
+    ip = value.first.address;
+  });
+  return ip;
 }
