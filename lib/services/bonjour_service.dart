@@ -21,7 +21,7 @@ const duktiServicePort = 4645;
 
 String clientName = '';
 
-setClientName() async {
+initClientName() async {
   String deviceName = await utils.getDeviceName();
   clientName = 'Dukti:${Platform.operatingSystem}:$deviceName:${nanoid.customAlphabet('1234567890abcdef', 8)}';
 }

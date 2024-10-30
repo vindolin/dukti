@@ -6,22 +6,15 @@ import 'package:device_info_plus/device_info_plus.dart';
 Future getDeviceName() async {
   // get the device name
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-  String name;
 
-  if (Platform.isAndroid) {
-    name = (await deviceInfo.androidInfo).model;
-  } else if (Platform.isIOS) {
-    name = (await deviceInfo.iosInfo).localizedModel;
-  } else if (Platform.isMacOS) {
-    name = (await deviceInfo.macOsInfo).computerName;
-  } else if (Platform.isWindows) {
-    name = (await deviceInfo.windowsInfo).computerName;
-  } else if (Platform.isLinux) {
-    name = (await deviceInfo.linuxInfo).name;
-  } else {
-    name = 'Flutter';
-  }
-
+  final name = switch (Platform.operatingSystem) {
+    'android' => (await deviceInfo.androidInfo).model,
+    'ios' => (await deviceInfo.iosInfo).localizedModel,
+    'macos' => (await deviceInfo.macOsInfo).computerName,
+    'windows' => (await deviceInfo.windowsInfo).computerName,
+    'linux' => (await deviceInfo.linuxInfo).name,
+    _ => 'Flutter',
+  };
   return name;
 }
 

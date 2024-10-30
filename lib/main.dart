@@ -16,7 +16,7 @@ import 'widgets/client_list_widget.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await bonsoir_service.setClientName();
+  await bonsoir_service.initClientName();
 
   runApp(
     const ProviderScope(

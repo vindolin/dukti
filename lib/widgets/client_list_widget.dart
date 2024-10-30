@@ -35,7 +35,11 @@ class ClientList extends ConsumerWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ClientScreen(name: name, address: client.host, ip: client.ip),
+                builder: (context) => ClientScreen(
+                  name: name,
+                  address: client.host,
+                  ip: client.ip,
+                ),
               ),
             );
           },
