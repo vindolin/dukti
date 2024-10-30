@@ -9,7 +9,7 @@ import 'package:bonsoir/bonsoir.dart' as bonsoir;
 import 'package:logger/logger.dart';
 
 import '/models/app_constants.dart';
-import '/client_provider.dart';
+import '../models/client_provider.dart';
 import '/utils.dart' as utils;
 
 part 'bonjour_service.g.dart';
@@ -44,23 +44,6 @@ startBroadcast() async {
   return broadcast;
 }
 
-///  Provider that holds the clients discovered by bonsoir
-@riverpod
-class DuktiClients extends _$DuktiClients {
-  @override
-  Map<String, Client> build() {
-    return {};
-  }
-
-  void set(String name, Client client) {
-    state = Map.from(state)..[name] = Client(name: name, host: client.host, ip: client.ip, platform: client.platform);
-  }
-
-  void remove(String name) {
-    state = Map.from(state)..remove(name);
-  }
-}
-
 /// Stream provider that listens to bonsoir events
 @riverpod
 Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
@@ -81,12 +64,12 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
 
         case bonsoir.BonsoirDiscoveryEventType.discoveryServiceResolved:
           logger.i('Service resolved : ${event.service?.name}');
-          final json = event.service?.toJson();
 
+          final json = event.service?.toJson();
           final String? name = event.service?.name;
-          // Add the client to the clients provider
           final String? host = json?['service.host'];
 
+          // if not self, add the client to the clients provider
           if (name != null && host != null && name != clientName) {
             final platformString = json?['service.attributes']['platform'];
             final ClientPlatform platform = ClientPlatform.values.firstWhere(

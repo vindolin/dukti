@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '/services/bonjour_service.dart' as bonsoir_service;
+import '/models/client_provider.dart';
 import '/screens/client_screen.dart';
 import '/widgets/platform_icon_widget.dart';
 
@@ -12,8 +12,7 @@ class ClientList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final clients =
-        ref.watch(bonsoir_service.duktiClientsProvider); // clients are dependent on the events provider further up
+    final clients = ref.watch(duktiClientsProvider); // clients are dependent on the events provider further up
 
     return ListView.builder(
       itemCount: clients.length,
