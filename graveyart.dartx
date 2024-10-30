@@ -1,0 +1,19 @@
+final eventAsyncValue = ref.watch(bonsoir_service.eventsProvider);
+
+
+child: eventAsyncValue.when(
+  data: (events) => ListView.builder(
+    itemCount: events.length,
+    itemBuilder: (context, index) {
+      final event = events[index];
+      final name = event.service?.toJson()['service.name'];
+      final address = event.service?.toJson()['service.host'];
+      return ListTile(
+        title: Text('Name: $name'),
+        subtitle: Text('Address: $address'),
+      );
+    },
+  ),
+  loading: () => const CircularProgressIndicator(),
+  error: (err, stack) => Text('Error: $err'),
+),
