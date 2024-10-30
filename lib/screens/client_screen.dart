@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 // import 'package:socket_io/socket_io.dart';
 
-class ClientScreen extends ConsumerWidget {
+class ClientScreen extends StatelessWidget {
   final String name;
   final String address;
   final String ip;
@@ -16,7 +15,7 @@ class ClientScreen extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Client'),

@@ -29,7 +29,7 @@ class ClientList extends ConsumerWidget {
               text: TextSpan(
             children: [
               TextSpan(text: client.ip, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-              TextSpan(text: ' (${client.host})', style: const TextStyle(color: Colors.grey)),
+              TextSpan(text: '(${client.host})', style: const TextStyle(color: Colors.grey)),
             ],
           )),
           onTap: () {
