@@ -18,7 +18,6 @@ class ClientList extends ConsumerWidget {
       itemCount: clients.length,
       itemBuilder: (context, index) {
         final entry = clients.entries.elementAt(index);
-        final name = entry.key;
         final client = entry.value;
 
         return ListTile(
@@ -28,18 +27,14 @@ class ClientList extends ConsumerWidget {
               text: TextSpan(
             children: [
               TextSpan(text: client.ip, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-              TextSpan(text: '(${client.host})', style: const TextStyle(color: Colors.grey)),
+              TextSpan(text: ' (${client.host})', style: const TextStyle(color: Colors.grey)),
             ],
           )),
           onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ClientScreen(
-                  name: name,
-                  address: client.host,
-                  ip: client.ip,
-                ),
+                builder: (context) => ClientScreen(client: client),
               ),
             );
           },

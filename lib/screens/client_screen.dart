@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import '../models/client_provider.dart';
 // import 'package:socket_io/socket_io.dart';
 
 class ClientScreen extends StatelessWidget {
-  final String name;
-  final String address;
-  final String ip;
+  final Client client;
 
   const ClientScreen({
     super.key,
-    required this.name,
-    required this.address,
-    required this.ip,
+    required this.client,
   });
 
   @override
@@ -24,9 +22,9 @@ class ClientScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Client: $name'),
-            Text('Address: $address'),
-            Text('IP: $ip'),
+            Text('Client: ${client.name}'),
+            Text('Host: ${client.host}'),
+            Text('IP: ${client.ip}'),
           ],
         ),
       ),
