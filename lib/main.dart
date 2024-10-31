@@ -1,11 +1,10 @@
 // ignore_for_file: avoid_print
-import 'package:bonsoir/bonsoir.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
+import 'package:socket_io/socket_io.dart';
 
-import 'network_helper.dart';
+import 'screens/home_screen.dart';
 import 'services/bonjour_service.dart' as bonsoir_service;
-import 'widgets/client_list_widget.dart';
 
 /*
   Hot reload sadly does not work with the bonsoir plugin
@@ -34,7 +33,7 @@ class DuktiApp extends ConsumerStatefulWidget {
 }
 
 class _DuktiAppState extends ConsumerState<DuktiApp> {
-  late final BonsoirBroadcast broadcast;
+  late final Server server;
 
   @override
   initState() {
@@ -43,7 +42,7 @@ class _DuktiAppState extends ConsumerState<DuktiApp> {
   }
 
   void startBroadcast() async {
-    broadcast = await bonsoir_service.startBroadcast();
+    server = await bonsoir_service.startBroadcast();
   }
 
   @override
@@ -57,37 +56,6 @@ class _DuktiAppState extends ConsumerState<DuktiApp> {
         useMaterial3: true,
       ),
       home: const DuktiHome(title: 'Dukti!'),
-    );
-  }
-}
-
-class DuktiHome extends StatelessWidget {
-  const DuktiHome({super.key, required this.title});
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(bonsoir_service.clientName),
-      ),
-      body: const Center(
-        child: ClientList(),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await getUnusedPort<int>(
-            (port) {
-              print('Port $port is available');
-              return port;
-            },
-          );
-        },
-        tooltip: 'Refresh',
-        child: const Icon(Icons.refresh),
-      ),
     );
   }
 }

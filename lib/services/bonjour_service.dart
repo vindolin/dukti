@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:nanoid/nanoid.dart' as nanoid;
 import 'package:bonsoir/bonsoir.dart' as bonsoir;
+import 'package:socket_io/socket_io.dart';
 
 import '/models/app_constants.dart';
 import '/services/socket_service.dart';
@@ -25,18 +26,17 @@ String clientName = '';
 initClientName() async {
   String deviceName = await getDeviceName();
   clientName = 'Dukti:${Platform.operatingSystem}:$deviceName:${nanoid.customAlphabet('1234567890abcdef', 8)}';
+  return clientName;
 }
 
 /// Start the bonsoir broadcast
-startBroadcast() async {
+FutureOr<Server> startBroadcast() async {
   duktiServicePort = await getUnusedPort<int>(
     (port) {
       logger.i('Using port $port');
       return port;
     },
   );
-
-  startSocketServer(duktiServicePort!);
 
   final service = bonsoir.BonsoirService(
     name: clientName,
@@ -51,7 +51,7 @@ startBroadcast() async {
   await broadcast.ready;
   await broadcast.start();
 
-  return broadcast;
+  return startSocketServer(duktiServicePort!);
 }
 
 /// Stream provider that listens to bonsoir events

@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:socket_io_client/socket_io_client.dart' as socket_io;
 
 import '/logger.dart';
-import '../models/client_provider.dart';
-import '../services/bonjour_service.dart';
-import '../services/bonjour_service.dart' show clientName;
+import '/models/client_provider.dart';
+import '/services/bonjour_service.dart';
 
 sendToServer(String ip, int port) {
   final uri = 'http://$ip:$port/clipboard';
@@ -43,7 +42,7 @@ class ClientScreen extends StatelessWidget {
             Text('Client: ${client.name}'),
             Text('Host: ${client.host}'),
             Text('IP: ${client.ip}'),
-            Text('port: ${client.port}'),
+            Text('Port: ${client.port}'),
           ],
         ),
       ),

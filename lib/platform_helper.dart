@@ -3,7 +3,6 @@ import 'dart:io' show Platform;
 import 'package:device_info_plus/device_info_plus.dart';
 
 Future getDeviceName() async {
-  // get the device name
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
 
   final name = switch (Platform.operatingSystem) {

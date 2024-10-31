@@ -2,17 +2,26 @@ import 'package:socket_io/socket_io.dart';
 
 import '/logger.dart';
 
-startSocketServer(int port) {
+// part 'socket_service.g.dart';
+
+// @riverpod
+// class SocketServer {
+//   build() {
+//     return startSocketServer(3000);
+//   }
+// }
+
+Server startSocketServer(int port) {
   // Dart server
-  var io = Server();
-  io.of('/clipboard').on('connection', (client) {
+  var server = Server();
+  server.of('/clipboard').on('connection', (client) {
     logger.i('connection /clipboard');
     client.on('msg', (data) {
       logger.i('data from /some => $data');
       client.emit('fromServer', "ok 2");
     });
   });
-  io.on('connection', (client) {
+  server.on('connection', (client) {
     // why does this only receive the first connection?
     logger.i('connection default namespace');
     client.on('msg', (data) {
@@ -20,5 +29,7 @@ startSocketServer(int port) {
       client.emit('fromServer', "ok");
     });
   });
-  io.listen(port);
+  server.listen(port);
+
+  return server;
 }
