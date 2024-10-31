@@ -2,7 +2,7 @@ import 'package:socket_io/socket_io.dart';
 
 import '/logger.dart';
 
-startSocketService(int port) {
+startSocketServer(int port) {
   // Dart server
   var io = Server();
   var nsp = io.of('/some');

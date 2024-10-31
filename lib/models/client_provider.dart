@@ -8,7 +8,7 @@ class Client {
   final String name;
   final String host;
   final String ip;
-  final String port;
+  final int port;
   final ClientPlatform platform;
 
   Client({

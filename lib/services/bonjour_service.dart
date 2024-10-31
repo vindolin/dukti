@@ -36,7 +36,7 @@ startBroadcast() async {
     },
   );
 
-  startSocketService(duktiServicePort!);
+  startSocketServer(duktiServicePort!);
 
   final service = bonsoir.BonsoirService(
     name: clientName,
@@ -91,7 +91,7 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
               name: name,
               host: host,
               ip: await lookupIP4(host),
-              port: json?['service.port'].toString() ?? '',
+              port: json?['service.port'],
               platform: platform,
             );
             clients.set(name, client);
