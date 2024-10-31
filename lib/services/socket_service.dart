@@ -1,18 +1,16 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:socket_io/socket_io.dart';
 
 import '/logger.dart';
+import 'bonjour_service.dart';
 
-// part 'socket_service.g.dart';
+part 'socket_service.g.dart';
 
-// @riverpod
-// class SocketServer {
-//   build() {
-//     return startSocketServer(3000);
-//   }
-// }
+@riverpod
+startSocketServer(Ref ref) async {
+  final duktiServicePort = await ref.watch(duktiServicePortProvider.future);
 
-Server startSocketServer(int port) {
-  // Dart server
   var server = Server();
   server.of('/clipboard').on('connection', (client) {
     logger.i('connection /clipboard');
@@ -22,14 +20,14 @@ Server startSocketServer(int port) {
     });
   });
   server.on('connection', (client) {
-    // why does this only receive the first connection?
+    // why does this only receive the first connection? /clipboard works fine
     logger.i('connection default namespace');
     client.on('msg', (data) {
       logger.i('data from default => $data');
       client.emit('fromServer', "ok");
     });
   });
-  server.listen(port);
+  server.listen(duktiServicePort);
 
   return server;
 }

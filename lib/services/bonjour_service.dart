@@ -5,9 +5,7 @@ import 'dart:io' show Platform;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:bonsoir/bonsoir.dart' as bonsoir;
-import 'package:socket_io/socket_io.dart';
 
-import '/services/socket_service.dart';
 import '/models/app_constants.dart';
 import '/models/client_provider.dart';
 import '/network_helper.dart' show getUnusedPort, lookupIP4;
@@ -18,17 +16,21 @@ import '/logger.dart';
 part 'bonjour_service.g.dart';
 
 const duktiServiceType = '_dukti._tcp';
-int? duktiServicePort;
 
-/// Start the bonsoir broadcast on a free port and returns the socket server
-FutureOr<Server> startBroadcast() async {
-  duktiServicePort = await getUnusedPort<int>(
+@riverpod
+FutureOr<int?> duktiServicePort(Ref ref) async {
+  return await getUnusedPort<int>(
     (port) {
       logger.i('Using port $port');
       return port;
     },
   );
+}
 
+/// Start the bonsoir broadcast on a free port and returns the socket server
+@riverpod
+startBroadcast(Ref ref) async {
+  final duktiServicePort = await ref.watch(duktiServicePortProvider.future);
   final service = bonsoir.BonsoirService(
     name: clientName,
     type: duktiServiceType,
@@ -41,8 +43,6 @@ FutureOr<Server> startBroadcast() async {
   bonsoir.BonsoirBroadcast broadcast = bonsoir.BonsoirBroadcast(service: service);
   await broadcast.ready;
   await broadcast.start();
-
-  return startSocketServer(duktiServicePort!);
 }
 
 /// Stream provider that listens to bonsoir events

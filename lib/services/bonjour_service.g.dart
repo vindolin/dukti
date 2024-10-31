@@ -6,6 +6,42 @@ part of 'bonjour_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+String _$duktiServicePortHash() => r'c364c51f7d3eae7447b4a69bde31c92fc8d2c2ea';
+
+/// See also [duktiServicePort].
+@ProviderFor(duktiServicePort)
+final duktiServicePortProvider = AutoDisposeFutureProvider<int?>.internal(
+  duktiServicePort,
+  name: r'duktiServicePortProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$duktiServicePortHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef DuktiServicePortRef = AutoDisposeFutureProviderRef<int?>;
+String _$startBroadcastHash() => r'e131d39832231742b4fccd44fa6b81497c9b37bc';
+
+/// Start the bonsoir broadcast on a free port and returns the socket server
+///
+/// Copied from [startBroadcast].
+@ProviderFor(startBroadcast)
+final startBroadcastProvider = AutoDisposeProvider<Object?>.internal(
+  startBroadcast,
+  name: r'startBroadcastProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$startBroadcastHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef StartBroadcastRef = AutoDisposeProviderRef<Object?>;
 String _$eventsHash() => r'cf22b922a44cb8e3c5a7cb6448fbec925202423c';
 
 /// Stream provider that listens to bonsoir events
