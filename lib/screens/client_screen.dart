@@ -8,13 +8,12 @@ import '../services/bonjour_service.dart';
 import '../services/bonjour_service.dart' show clientName;
 
 sendToServer(String ip, int port) {
-  final uri = 'http://$ip:$port';
+  final uri = 'http://$ip:$port/clipboard';
   logger.i(uri);
   socket_io.Socket socket = socket_io.io(uri, socket_io.OptionBuilder().setTransports(['websocket']).build());
   socket.onConnect((_) {
     logger.i('connect');
     socket.emit('msg', clientName);
-    // socket.disconnect();
   });
   socket.on('event', (data) => logger.i(data));
   socket.onDisconnect((_) => logger.i('disconnect'));

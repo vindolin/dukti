@@ -5,15 +5,15 @@ import '/logger.dart';
 startSocketServer(int port) {
   // Dart server
   var io = Server();
-  var nsp = io.of('/some');
-  nsp.on('connection', (client) {
-    logger.i('connection /some');
+  io.of('/clipboard').on('connection', (client) {
+    logger.i('connection /clipboard');
     client.on('msg', (data) {
       logger.i('data from /some => $data');
       client.emit('fromServer', "ok 2");
     });
   });
   io.on('connection', (client) {
+    // why does this only receive the first connection?
     logger.i('connection default namespace');
     client.on('msg', (data) {
       logger.i('data from default => $data');
