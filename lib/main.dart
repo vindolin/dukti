@@ -5,6 +5,7 @@ import 'package:socket_io/socket_io.dart';
 
 import 'screens/home_screen.dart';
 import 'services/bonjour_service.dart' as bonsoir_service;
+import 'models/client_name.dart';
 
 /*
   Hot reload sadly does not work with the bonsoir plugin
@@ -14,9 +15,9 @@ import 'services/bonjour_service.dart' as bonsoir_service;
 */
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  await initClientName();
 
-  await bonsoir_service.initClientName();
+  WidgetsFlutterBinding.ensureInitialized();
 
   runApp(
     const ProviderScope(

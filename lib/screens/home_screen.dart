@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 
-import '/services/bonjour_service.dart' as bonsoir_service;
+import '/models/client_name.dart';
 import '/widgets/client_list_widget.dart';
 // import '/logger.dart';
 
@@ -19,7 +19,7 @@ class DuktiHome extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(bonsoir_service.clientName),
+        title: Text(clientName),
       ),
       body: const Center(
         child: ClientList(),

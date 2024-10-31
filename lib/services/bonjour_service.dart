@@ -4,32 +4,23 @@ import 'dart:io' show Platform;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:nanoid/nanoid.dart' as nanoid;
 import 'package:bonsoir/bonsoir.dart' as bonsoir;
 import 'package:socket_io/socket_io.dart';
 
-import '/models/app_constants.dart';
 import '/services/socket_service.dart';
+import '/models/app_constants.dart';
+import '/models/client_provider.dart';
 import '/network_helper.dart' show getUnusedPort, lookupIP4;
-import '../platform_helper.dart';
-import '../models/client_provider.dart';
+import '/models/client_name.dart';
 
 import '/logger.dart';
+
 part 'bonjour_service.g.dart';
 
 const duktiServiceType = '_dukti._tcp';
 int? duktiServicePort;
 
-String clientName = '';
-
-/// Initialize the client name e.g. Dukti:windows:12345678
-initClientName() async {
-  String deviceName = await getDeviceName();
-  clientName = 'Dukti:${Platform.operatingSystem}:$deviceName:${nanoid.customAlphabet('1234567890abcdef', 8)}';
-  return clientName;
-}
-
-/// Start the bonsoir broadcast
+/// Start the bonsoir broadcast on a free port and returns the socket server
 FutureOr<Server> startBroadcast() async {
   duktiServicePort = await getUnusedPort<int>(
     (port) {
@@ -67,11 +58,13 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
   if (discovery.eventStream != null) {
     await for (final event in discovery.eventStream!) {
       switch (event.type) {
+        // found a service, lets resolve it
         case bonsoir.BonsoirDiscoveryEventType.discoveryServiceFound:
           logger.i('Service found : ${event.service?.name}');
           event.service?.resolve(discovery.serviceResolver);
           break;
 
+        // resolved a service, add it to the clients provider
         case bonsoir.BonsoirDiscoveryEventType.discoveryServiceResolved:
           logger.i('Service resolved : ${event.service?.name}');
 
@@ -79,7 +72,7 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
           final String? name = event.service?.name;
           final String? host = json?['service.host'];
 
-          // if not self, add the client to the clients provider
+          // only add it if it's not the current client
           if (name != null && host != null && name != clientName) {
             final platformString = json?['service.attributes']['platform'];
             final ClientPlatform platform = ClientPlatform.values.firstWhere(
@@ -87,7 +80,7 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
               orElse: () => ClientPlatform.flutter,
             );
 
-            Client client = Client(
+            DuktiClient client = DuktiClient(
               name: name,
               host: host,
               ip: await lookupIP4(host),
@@ -102,6 +95,7 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
           yield allEvents;
           break;
 
+        // lost a service
         case bonsoir.BonsoirDiscoveryEventType.discoveryServiceLost:
           logger.i('Service lost : ${event.service?.name}');
 

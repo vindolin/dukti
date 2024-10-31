@@ -4,14 +4,14 @@ import 'app_constants.dart';
 
 part 'client_model.g.dart';
 
-class Client {
+class DuktiClient {
   final String name;
   final String host;
   final String ip;
   final int port;
   final ClientPlatform platform;
 
-  Client({
+  DuktiClient({
     required this.name,
     required this.host,
     required this.ip,
@@ -24,13 +24,13 @@ class Client {
 @riverpod
 class DuktiClients extends _$DuktiClients {
   @override
-  Map<String, Client> build() {
+  Map<String, DuktiClient> build() {
     return {};
   }
 
-  void set(String name, Client client) {
+  void set(String name, DuktiClient client) {
     state = Map.from(state)
-      ..[name] = Client(
+      ..[name] = DuktiClient(
         name: name,
         host: client.host,
         ip: client.ip,

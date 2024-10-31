@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:socket_io_client/socket_io_client.dart' as socket_io;
 
 import '/logger.dart';
+import '/models/client_name.dart';
 import '/models/client_provider.dart';
-import '/services/bonjour_service.dart';
 
 sendToServer(String ip, int port) {
   final uri = 'http://$ip:$port/clipboard';
@@ -20,7 +20,7 @@ sendToServer(String ip, int port) {
 }
 
 class ClientScreen extends StatelessWidget {
-  final Client client;
+  final DuktiClient client;
 
   const ClientScreen({
     super.key,
