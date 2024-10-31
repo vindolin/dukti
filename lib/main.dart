@@ -3,7 +3,7 @@ import 'package:bonsoir/bonsoir.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 
-import 'services/socket_service.dart';
+import 'network_helper.dart';
 import 'services/bonjour_service.dart' as bonsoir_service;
 import 'widgets/client_list_widget.dart';
 

@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:socket_io_client/socket_io_client.dart' as socket_io;
 
+import '/logger.dart';
 import '../models/client_provider.dart';
-// import 'package:socket_io/socket_io.dart';
 
-// connectSocket() {
-//   // Dart client
-//   IO.Socket socket = IO.io('http://localhost:3000');
-//   socket.onConnect((_) {
-//     print('connect');
-//     socket.emit('msg', 'test');
-//   });
-//   socket.on('event', (data) => print(data));
-//   socket.onDisconnect((_) => print('disconnect'));
-//   socket.on('fromServer', (_) => print(_));
-// }
+connectSocket() {
+  // Dart client
+  socket_io.Socket socket = socket_io.io('http://localhost:3000');
+  socket.onConnect((_) {
+    logger.i('connect');
+    socket.emit('msg', 'test');
+  });
+  socket.on('event', (data) => logger.i(data));
+  socket.onDisconnect((_) => logger.i('disconnect'));
+  socket.on('fromServer', (_) => logger.i(_));
+}
 
 class ClientScreen extends StatelessWidget {
   final Client client;
