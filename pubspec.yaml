@@ -23,6 +23,7 @@ dependencies:
   logger: ^2.4.0
   socket_io: ^1.0.1
   font_awesome_flutter: ^10.7.0
+  socket_io_client: ^1.0.2
 
 dev_dependencies:
   flutter_test:

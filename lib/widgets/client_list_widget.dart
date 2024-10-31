@@ -27,6 +27,7 @@ class ClientList extends ConsumerWidget {
               text: TextSpan(
             children: [
               TextSpan(text: client.ip, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+              TextSpan(text: ':${client.port}', style: const TextStyle(color: Colors.green)),
               TextSpan(text: ' (${client.host})', style: const TextStyle(color: Colors.grey)),
             ],
           )),

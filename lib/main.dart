@@ -3,6 +3,7 @@ import 'package:bonsoir/bonsoir.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 
+import 'services/socket_service.dart';
 import 'services/bonjour_service.dart' as bonsoir_service;
 import 'widgets/client_list_widget.dart';
 
@@ -76,7 +77,14 @@ class DuktiHome extends StatelessWidget {
         child: ClientList(),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {},
+        onPressed: () async {
+          await getUnusedPort<int>(
+            (port) {
+              print('Port $port is available');
+              return port;
+            },
+          );
+        },
         tooltip: 'Refresh',
         child: const Icon(Icons.refresh),
       ),

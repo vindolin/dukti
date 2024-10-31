@@ -8,12 +8,14 @@ class Client {
   final String name;
   final String host;
   final String ip;
+  final String port;
   final ClientPlatform platform;
 
   Client({
     required this.name,
     required this.host,
     required this.ip,
+    required this.port,
     required this.platform,
   });
 }
@@ -32,6 +34,7 @@ class DuktiClients extends _$DuktiClients {
         name: name,
         host: client.host,
         ip: client.ip,
+        port: client.port,
         platform: client.platform,
       );
   }
