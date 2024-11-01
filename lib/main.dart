@@ -1,7 +1,6 @@
 // ignore_for_file: avoid_print
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
-import 'package:socket_io/socket_io.dart';
 
 import 'screens/home_screen.dart';
 import 'services/bonjour_service.dart' as bonsoir_service;
@@ -29,29 +28,18 @@ void main() async {
   );
 }
 
-class DuktiApp extends ConsumerStatefulWidget {
+class DuktiApp extends ConsumerWidget {
   const DuktiApp({super.key});
 
   @override
-  ConsumerState<DuktiApp> createState() => _DuktiAppState();
-}
-
-class _DuktiAppState extends ConsumerState<DuktiApp> {
-  late final Server server;
-
-  @override
-  initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     logger.t('Building DuktiApp');
 
     ref.watch(bonsoir_service.eventsProvider); // start listening to events
-    ref.watch(bonsoir_service.startBroadcastProvider);
-    ref.watch(socket_service.startSocketServerProvider);
+    ref.watch(bonsoir_service.startBroadcastProvider); // broadcasting our dukti service
+    final socketEventStream = ref.watch(socket_service.socketEventsProvider);
 
+    logger.e(socketEventStream.value?.data);
     return MaterialApp(
       title: 'Dukti',
       theme: ThemeData(
