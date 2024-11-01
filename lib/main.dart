@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'screens/home_screen.dart';
 import 'services/bonjour_service.dart' as bonsoir_service;
-import 'services/socket_service.dart' as socket_service;
+// import 'services/socket_service.dart' as socket_service;
 import 'models/client_name.dart';
 
 import '/logger.dart';
@@ -37,9 +37,9 @@ class DuktiApp extends ConsumerWidget {
 
     ref.watch(bonsoir_service.eventsProvider); // start listening to events
     ref.watch(bonsoir_service.startBroadcastProvider); // broadcasting our dukti service
-    final socketEventStream = ref.watch(socket_service.socketEventsProvider);
+    // final socketEventStream = ref.watch(socket_service.socketEventsProvider);
+    // logger.e(socketEventStream.value?.data);
 
-    logger.e(socketEventStream.value?.data);
     return MaterialApp(
       title: 'Dukti',
       theme: ThemeData(

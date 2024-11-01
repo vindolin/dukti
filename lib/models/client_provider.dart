@@ -1,6 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import 'app_constants.dart';
+import '/platform_helper.dart';
 
 part 'client_model.g.dart';
 

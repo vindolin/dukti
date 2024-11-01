@@ -2,6 +2,8 @@ import 'dart:io' show Platform;
 
 import 'package:device_info_plus/device_info_plus.dart';
 
+enum ClientPlatform { android, ios, macos, windows, linux, flutter }
+
 Future getDeviceName() async {
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
 

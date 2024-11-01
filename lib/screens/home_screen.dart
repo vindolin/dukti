@@ -21,6 +21,8 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
   @override
   initState() {
     super.initState();
+
+    // initialize the toast
     fToast = FToast();
     fToast?.init(context);
   }

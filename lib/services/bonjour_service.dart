@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:bonsoir/bonsoir.dart' as bonsoir;
 
-import '/models/app_constants.dart';
+import '/platform_helper.dart';
 import '/models/client_provider.dart';
 import '/network_helper.dart' show getUnusedPort, lookupIP4;
 import '/models/client_name.dart';
