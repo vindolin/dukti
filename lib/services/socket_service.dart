@@ -9,9 +9,6 @@ import 'bonjour_service.dart';
 
 part 'socket_service.g.dart';
 
-//stream provider that listens to socket events
-
-// Define a class to represent socket events
 class SocketEvent {
   final String namespace;
   final String eventName;
@@ -24,11 +21,12 @@ class SocketEvent {
   });
 }
 
-// A provider to hold the StreamController<SocketEvent>
+/// Controller for the socket events
 final _socketEventController = StateProvider<StreamController<SocketEvent>>((ref) {
   return StreamController<SocketEvent>.broadcast();
 });
 
+/// Stream provider for the socket events
 @riverpod
 Stream<SocketEvent> socketEvents(Ref ref) async* {
   final duktiServicePort = await ref.watch(duktiServicePortProvider.future);
