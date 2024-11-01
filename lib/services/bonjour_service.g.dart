@@ -23,13 +23,13 @@ final duktiServicePortProvider = AutoDisposeFutureProvider<int?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef DuktiServicePortRef = AutoDisposeFutureProviderRef<int?>;
-String _$startBroadcastHash() => r'e131d39832231742b4fccd44fa6b81497c9b37bc';
+String _$startBroadcastHash() => r'156acbbc5e5600c4ad2f052a1892df1e3b9c99a6';
 
 /// Start the bonsoir broadcast on a free port and returns the socket server
 ///
 /// Copied from [startBroadcast].
 @ProviderFor(startBroadcast)
-final startBroadcastProvider = AutoDisposeProvider<Object?>.internal(
+final startBroadcastProvider = AutoDisposeProvider<void>.internal(
   startBroadcast,
   name: r'startBroadcastProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -41,7 +41,7 @@ final startBroadcastProvider = AutoDisposeProvider<Object?>.internal(
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef StartBroadcastRef = AutoDisposeProviderRef<Object?>;
+typedef StartBroadcastRef = AutoDisposeProviderRef<void>;
 String _$eventsHash() => r'cf22b922a44cb8e3c5a7cb6448fbec925202423c';
 
 /// Stream provider that listens to bonsoir events

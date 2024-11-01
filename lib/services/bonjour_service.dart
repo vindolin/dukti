@@ -29,7 +29,7 @@ FutureOr<int?> duktiServicePort(Ref ref) async {
 
 /// Start the bonsoir broadcast on a free port and returns the socket server
 @riverpod
-startBroadcast(Ref ref) async {
+void startBroadcast(Ref ref) async {
   final duktiServicePort = await ref.watch(duktiServicePortProvider.future);
   final service = bonsoir.BonsoirService(
     name: clientName,
