@@ -6,10 +6,11 @@ import '/logger.dart';
 import '/models/client_name.dart';
 import '/models/client_provider.dart';
 
-sendToServer(String ip, int port) {
-  final uri = 'http://$ip:$port/clipboard';
-  logger.i(uri);
-  socket_io.Socket socket = socket_io.io(uri, socket_io.OptionBuilder().setTransports(['websocket']).build());
+sendClipboard(String ip, int port) {
+  socket_io.Socket socket = socket_io.io(
+    'http://$ip:$port/clipboard',
+    socket_io.OptionBuilder().setTransports(['websocket']).build(),
+  );
   socket.onConnect((_) {
     logger.i('connect');
     socket.emit('msg', clientName);
@@ -18,6 +19,8 @@ sendToServer(String ip, int port) {
   socket.onDisconnect((_) => logger.i('disconnect'));
   socket.on('fromServer', (_) => logger.i(_));
 }
+
+// sendFile(String) {}
 
 class ClientScreen extends StatelessWidget {
   final DuktiClient client;
@@ -51,7 +54,7 @@ class ClientScreen extends StatelessWidget {
           // await Clipboard.getData('text/plain').then((value) {
           //   // open a socket to $ip and transfer the value
           // });
-          sendToServer(client.ip, client.port);
+          sendClipboard(client.ip, client.port);
         },
         tooltip: 'paste',
         child: const Icon(Icons.paste),
