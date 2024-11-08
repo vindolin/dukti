@@ -25,7 +25,7 @@ final duktiServicePortProvider = AutoDisposeFutureProvider<int?>.internal(
 typedef DuktiServicePortRef = AutoDisposeFutureProviderRef<int?>;
 String _$startBroadcastHash() => r'156acbbc5e5600c4ad2f052a1892df1e3b9c99a6';
 
-/// Start the bonsoir broadcast on a free port and returns the socket server
+/// Start the bonsoir broadcast on a free port
 ///
 /// Copied from [startBroadcast].
 @ProviderFor(startBroadcast)
