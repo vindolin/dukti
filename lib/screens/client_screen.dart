@@ -1,19 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 // import 'package:flutter/services.dart';
 import 'package:socket_io_client/socket_io_client.dart' as socket_io;
 
 import '/logger.dart';
-import '/models/client_name.dart';
+// import '/models/client_name.dart';
 import '/models/client_provider.dart';
 
-sendClipboard(String ip, int port) {
+Future<ClipboardData?> getData(String format) async {
+  final Map<String, dynamic>? result = await SystemChannels.platform.invokeMethod(
+    'Clipboard.getData',
+    format,
+  );
+  if (result == null) {
+    return null;
+  }
+  return ClipboardData(text: result['text'] as String);
+}
+
+sendClipboard(String ip, int port) async {
+  final clipboardData = await getData('text/plain');
+  logger.i('Clipboard data: ${clipboardData?.text}');
+
   socket_io.Socket socket = socket_io.io(
     'http://$ip:$port/clipboard',
     socket_io.OptionBuilder().setTransports(['websocket']).build(),
   );
   socket.onConnect((_) {
     logger.i('connect');
-    socket.emit('msg', clientName);
+    socket.emit('msg', clipboardData?.text);
   });
   socket.on('event', (data) => logger.i(data));
   socket.onDisconnect((_) => logger.i('disconnect'));

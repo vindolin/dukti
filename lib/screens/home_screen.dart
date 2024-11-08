@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -17,6 +18,17 @@ class DuktiHome extends ConsumerStatefulWidget {
 
 class _DuktiHomeState extends ConsumerState<DuktiHome> {
   FToast? fToast;
+
+  //TODO: use ScaffoldMessenger instead of FToast
+
+  static Future<void> setData(ClipboardData data) async {
+    await SystemChannels.platform.invokeMethod<void>(
+      'Clipboard.setData',
+      <String, dynamic>{
+        'text': data.text,
+      },
+    );
+  }
 
   @override
   initState() {
@@ -66,6 +78,10 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
 
     // show snackbar on socket event
     if (socketEventStream.hasValue) {
+      final clipboardData = socketEventStream.value!.data.toString();
+      if (clipboardData.isNotEmpty) {
+        setData(ClipboardData(text: clipboardData));
+      }
       _showToast(socketEventStream.value!.data.toString());
     }
 
