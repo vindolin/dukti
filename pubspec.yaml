@@ -22,7 +22,7 @@ dependencies:
   fast_immutable_collections: ^10.2.4
   logger: ^2.4.0
   socket_io: ^1.0.1
-  font_awesome_flutter: ^10.7.0
+  font_awesome_flutter: ^10.8.0
   socket_io_client: ^1.0.2
   fluttertoast: ^8.2.8
 
