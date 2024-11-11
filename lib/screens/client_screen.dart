@@ -1,25 +1,37 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 // import 'package:flutter/services.dart';
 import 'package:socket_io_client/socket_io_client.dart' as socket_io;
+import 'package:file_picker/file_picker.dart';
 
 import '/logger.dart';
 // import '/models/client_name.dart';
 import '/models/client_provider.dart';
 
-Future<ClipboardData?> getData(String format) async {
-  final Map<String, dynamic>? result = await SystemChannels.platform.invokeMethod(
-    'Clipboard.getData',
-    format,
-  );
-  if (result == null) {
-    return null;
+uploadFile(String ip, int port) async {
+  FilePickerResult? result = await FilePicker.platform.pickFiles();
+  if (result != null) {
+    final file = File(result.files.single.path!);
+    logger.i(file);
+
+    socket_io.Socket socket = socket_io.io(
+      'http://$ip:$port/upload',
+      socket_io.OptionBuilder().setTransports(['websocket']).build(),
+    );
+    socket.onConnect((_) {
+      logger.i('connect');
+      socket.emitWithBinary('upload', file.readAsBytesSync());
+    });
+    socket.onDisconnect((_) => logger.i('disconnect'));
+  } else {
+    logger.i('No file selected');
   }
-  return ClipboardData(text: result['text'] as String);
 }
 
 sendClipboard(String ip, int port) async {
-  final clipboardData = await getData('text/plain');
+  final clipboardData = await Clipboard.getData('text/plain');
   logger.i('Clipboard data: ${clipboardData?.text}');
 
   socket_io.Socket socket = socket_io.io(
@@ -28,11 +40,9 @@ sendClipboard(String ip, int port) async {
   );
   socket.onConnect((_) {
     logger.i('connect');
-    socket.emit('msg', clipboardData?.text);
+    socket.emit('clipboard', clipboardData?.text);
   });
-  socket.on('event', (data) => logger.i(data));
   socket.onDisconnect((_) => logger.i('disconnect'));
-  socket.on('fromServer', (_) => logger.i(_));
 }
 
 // sendFile(String) {}
@@ -64,15 +74,24 @@ class ClientScreen extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          // await Clipboard.getData('text/plain').then((value) {
-          //   // open a socket to $ip and transfer the value
-          // });
-          sendClipboard(client.ip, client.port);
-        },
-        tooltip: 'paste',
-        child: const Icon(Icons.paste),
+      bottomNavigationBar: BottomAppBar(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            IconButton(
+              onPressed: () async {
+                uploadFile(client.ip, client.port);
+              },
+              icon: const Icon(Icons.upload),
+            ),
+            IconButton(
+              onPressed: () async {
+                sendClipboard(client.ip, client.port);
+              },
+              icon: const Icon(Icons.paste),
+            ),
+          ],
+        ),
       ),
     );
   }

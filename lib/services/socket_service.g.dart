@@ -13,8 +13,7 @@ String _$socketEventsHash() => r'5e988f9247acd779a533b6e6560107f9a4f6a091';
 final socketEventsProvider = AutoDisposeStreamProvider<SocketEvent>.internal(
   socketEvents,
   name: r'socketEventsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$socketEventsHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product') ? null : _$socketEventsHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

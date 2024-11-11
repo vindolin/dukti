@@ -21,15 +21,6 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
 
   //TODO: use ScaffoldMessenger instead of FToast
 
-  static Future<void> setData(ClipboardData data) async {
-    await SystemChannels.platform.invokeMethod<void>(
-      'Clipboard.setData',
-      <String, dynamic>{
-        'text': data.text,
-      },
-    );
-  }
-
   @override
   initState() {
     super.initState();
@@ -80,7 +71,7 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
     if (socketEventStream.hasValue) {
       final clipboardData = socketEventStream.value!.data.toString();
       if (clipboardData.isNotEmpty) {
-        setData(ClipboardData(text: clipboardData));
+        Clipboard.setData(ClipboardData(text: clipboardData));
       }
       _showToast(socketEventStream.value!.data.toString());
     }
