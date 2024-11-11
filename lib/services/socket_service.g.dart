@@ -8,7 +8,9 @@ part of 'socket_service.dart';
 
 String _$socketEventsHash() => r'5e988f9247acd779a533b6e6560107f9a4f6a091';
 
-/// See also [socketEvents].
+/// Stream provider for the socket events
+///
+/// Copied from [socketEvents].
 @ProviderFor(socketEvents)
 final socketEventsProvider = AutoDisposeStreamProvider<SocketEvent>.internal(
   socketEvents,

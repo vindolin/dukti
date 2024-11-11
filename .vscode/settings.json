@@ -1,5 +1,0 @@
-{
-    "cmake.ignoreCMakeListsMissing": true,
-    "dart.flutterSdkPath": "C:\\src\\flutter_win"
-    /*"dart.flutterSdkPath": "C:\\src\\flutter_wsl2"*/
-}
