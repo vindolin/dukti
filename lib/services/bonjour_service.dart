@@ -8,8 +8,9 @@ import 'package:bonsoir/bonsoir.dart' as bonsoir;
 
 import '/platform_helper.dart';
 import '/models/client_provider.dart';
-import '/network_helper.dart' show getUnusedPort, lookupIP4;
+import '/network_helper.dart' show lookupIP4;
 import '/models/client_name.dart';
+import '/services/server_port_service.dart' as server_port_service;
 
 import '/logger.dart';
 
@@ -17,24 +18,23 @@ part 'bonjour_service.g.dart';
 
 const duktiServiceType = '_dukti._tcp';
 
-@riverpod
-FutureOr<int?> duktiServicePort(Ref ref) async {
-  return await getUnusedPort<int>(
-    (port) {
-      logger.i('Using port $port');
-      return port;
-    },
-  );
-}
+// @riverpod
+// FutureOr<int?> duktiServicePort(Ref ref) async {
+//   return await getUnusedPort<int>(
+//     (port) {
+//       logger.i('Using port $port');
+//       return port;
+//     },
+//   );
+// }
 
 /// Start the bonsoir broadcast on a free port
 @riverpod
 void startBroadcast(Ref ref) async {
-  final duktiServicePort = await ref.watch(duktiServicePortProvider.future);
   final service = bonsoir.BonsoirService(
     name: clientName,
     type: duktiServiceType,
-    port: duktiServicePort!,
+    port: server_port_service.serverPort!,
     attributes: {
       'platform': Platform.operatingSystem,
     },

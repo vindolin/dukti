@@ -6,24 +6,7 @@ part of 'bonjour_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$duktiServicePortHash() => r'c364c51f7d3eae7447b4a69bde31c92fc8d2c2ea';
-
-/// See also [duktiServicePort].
-@ProviderFor(duktiServicePort)
-final duktiServicePortProvider = AutoDisposeFutureProvider<int?>.internal(
-  duktiServicePort,
-  name: r'duktiServicePortProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$duktiServicePortHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef DuktiServicePortRef = AutoDisposeFutureProviderRef<int?>;
-String _$startBroadcastHash() => r'156acbbc5e5600c4ad2f052a1892df1e3b9c99a6';
+String _$startBroadcastHash() => r'd74e0579d0f711630c2d47f4e3aaf7cec10a912f';
 
 /// Start the bonsoir broadcast on a free port
 ///

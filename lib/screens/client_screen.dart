@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 
 // import '/models/client_name.dart';
 import '/models/client_provider.dart';
+import '/widgets/upload_widget.dart';
 
 uploadFile(String ip, int port) async {}
 
-sendClipboard(String ip, int port) async {}
+sendClipboard(DuktiClient client) async {}
 
 // sendFile(String) {}
 
@@ -24,7 +24,7 @@ class ClientScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Client'),
+        title: Text('Client ${client.name}'),
       ),
       body: Center(
         child: Column(
@@ -41,15 +41,10 @@ class ClientScreen extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
+            UploadWidget(client: client),
             IconButton(
               onPressed: () async {
-                uploadFile(client.ip, client.port);
-              },
-              icon: const Icon(Icons.upload),
-            ),
-            IconButton(
-              onPressed: () async {
-                sendClipboard(client.ip, client.port);
+                sendClipboard(client);
               },
               icon: const Icon(Icons.paste),
             ),
