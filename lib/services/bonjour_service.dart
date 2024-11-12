@@ -18,16 +18,6 @@ part 'bonjour_service.g.dart';
 
 const duktiServiceType = '_dukti._tcp';
 
-// @riverpod
-// FutureOr<int?> duktiServicePort(Ref ref) async {
-//   return await getUnusedPort<int>(
-//     (port) {
-//       logger.i('Using port $port');
-//       return port;
-//     },
-//   );
-// }
-
 /// Start the bonsoir broadcast on a free port
 @riverpod
 void startBroadcast(Ref ref) async {

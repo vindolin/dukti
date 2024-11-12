@@ -1,4 +1,5 @@
 // ignore_for_file: avoid_print
+import 'package:dukti/services/clipboard_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 
@@ -21,7 +22,6 @@ import '/logger.dart';
 void main() async {
   await getPort();
   logger.e('Using port $serverPort');
-  await startServer(serverPort!);
   await initClientName();
 
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,6 +40,8 @@ class DuktiApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     logger.t('Building DuktiApp');
 
+    ref.watch(clipboardServiceProvider);
+    ref.watch(startWebServerProvider(serverPort!)); // start the web server
     ref.watch(bonsoir_service.eventsProvider); // start listening to events
     ref.watch(bonsoir_service.startBroadcastProvider); // broadcasting our dukti service
     // final socketEventStream = ref.watch(socket_service.socketEventsProvider);

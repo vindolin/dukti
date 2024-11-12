@@ -36,7 +36,6 @@ class _UploadWidgetState extends State<UploadWidget> {
       final address = 'http://${widget.client.ip}:${widget.client.port}/upload';
 
       try {
-        logger.e(address);
         await dio.post(
           address,
           data: formData,

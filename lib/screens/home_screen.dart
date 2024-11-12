@@ -1,10 +1,13 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import '/models/client_name.dart';
+import '/services/clipboard_service.dart';
 import '/widgets/client_list_widget.dart';
-// import '/logger.dart';
+
+import '/logger.dart';
 
 class DuktiHome extends ConsumerStatefulWidget {
   final String title;
@@ -28,51 +31,52 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
     fToast?.init(context);
   }
 
-  // _showToast(String message) {
-  //   final toast = Container(
-  //     decoration: BoxDecoration(
-  //       color: Colors.grey[300],
-  //       borderRadius: BorderRadius.circular(10),
-  //       boxShadow: const [
-  //         BoxShadow(
-  //           color: Colors.black26,
-  //           blurRadius: 10.0,
-  //           spreadRadius: 2.0,
-  //           offset: Offset(5.0, 5.0),
-  //         ),
-  //       ],
-  //     ),
-  //     child: Padding(
-  //       padding: const EdgeInsets.all(8.0),
-  //       child: Text(
-  //         message,
-  //         style: const TextStyle(color: Colors.black),
-  //       ),
-  //     ),
-  //   );
+  _showToast(String message) {
+    final toast = Container(
+      decoration: BoxDecoration(
+        color: Colors.grey[300],
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 10.0,
+            spreadRadius: 2.0,
+            offset: Offset(5.0, 5.0),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          message,
+          style: const TextStyle(color: Colors.black),
+        ),
+      ),
+    );
 
-  //   // if we don't use a future here, the toast will throw an error
-  //   Future(
-  //     () => fToast?.showToast(
-  //       child: toast,
-  //       gravity: ToastGravity.BOTTOM,
-  //       toastDuration: const Duration(seconds: 2),
-  //     ),
-  //   );
-  // }
+    // if we don't use a future here, the toast will throw an error
+    Future(
+      () => fToast?.showToast(
+        child: toast,
+        gravity: ToastGravity.BOTTOM,
+        toastDuration: const Duration(seconds: 2),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    // // final socketEventStream = ref.watch(socket_service.socketEventsProvider);
+    final clipboardStream = ref.watch(clipboardServiceProvider);
 
-    // // show snackbar on socket event
-    // if (socketEventStream.hasValue) {
-    //   final clipboardData = socketEventStream.value!.data.toString();
-    //   if (clipboardData.isNotEmpty) {
-    //     Clipboard.setData(ClipboardData(text: clipboardData));
-    //   }
-    //   _showToast(socketEventStream.value!.data.toString());
-    // }
+    // show snackbar on socket event
+    if (clipboardStream.hasValue) {
+      final clipboardData = clipboardStream.value;
+      if (clipboardData != null) {
+        // logger.e('Clipboard data: $clipboardData');
+        Clipboard.setData(ClipboardData(text: clipboardData));
+        _showToast(clipboardStream.value.toString());
+      }
+    }
 
     return Scaffold(
       appBar: AppBar(
