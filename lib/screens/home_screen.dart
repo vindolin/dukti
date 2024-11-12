@@ -7,8 +7,6 @@ import '/models/client_name.dart';
 import '/services/clipboard_service.dart';
 import '/widgets/client_list_widget.dart';
 
-import '/logger.dart';
-
 class DuktiHome extends ConsumerStatefulWidget {
   final String title;
   const DuktiHome({super.key, required this.title});

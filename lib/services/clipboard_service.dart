@@ -10,13 +10,13 @@ import '/logger.dart';
 
 part 'clipboard_service.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 class ClipboardService extends _$ClipboardService {
   late final StreamController<String> _controller;
 
   @override
   Stream<String> build() {
-    _controller = StreamController<String>.broadcast();
+    _controller = StreamController<String>();
 
     ref.onDispose(() {
       _controller.close();
