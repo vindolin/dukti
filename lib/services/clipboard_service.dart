@@ -12,12 +12,10 @@ part 'clipboard_service.g.dart';
 
 @riverpod
 class ClipboardService extends _$ClipboardService {
-  late final StreamController<String> _controller;
+  final StreamController<String> _controller = StreamController<String>();
 
   @override
   Stream<String> build() {
-    _controller = StreamController<String>();
-
     ref.onDispose(() {
       _controller.close();
     });

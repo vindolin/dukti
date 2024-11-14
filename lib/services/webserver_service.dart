@@ -33,9 +33,12 @@ Future<Response> _handleRequest(Request request, Ref ref) async {
   final clipboardService = ref.watch(clipboardServiceProvider.notifier);
 
   if (request.method == 'POST') {
+    // both upload and clipboard requests are POST requests
     if (request.url.path == 'upload') {
+      // save the uploaded file to the app's documents directory
       final contentType = request.headers['content-type'];
       if (contentType != null && contentType.startsWith('multipart/form-data')) {
+        // parse the multipart request
         final boundary = contentType.split('boundary=')[1];
         final transformer = MimeMultipartTransformer(boundary);
         final bodyStream = request.read();
@@ -58,6 +61,7 @@ Future<Response> _handleRequest(Request request, Ref ref) async {
         return Response(400, body: 'Invalid content type');
       }
     } else if (request.url.path == 'clipboard') {
+      // set the local clipboard to the received clipboard text
       Map payload = jsonDecode(await request.readAsString());
       clipboardService.set(payload['text']);
       return Response.ok('Clipboard received');

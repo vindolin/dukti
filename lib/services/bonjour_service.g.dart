@@ -6,7 +6,7 @@ part of 'bonjour_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$startBroadcastHash() => r'd74e0579d0f711630c2d47f4e3aaf7cec10a912f';
+String _$startBroadcastHash() => r'f253d2bebe312fd81b6bbad099616751337d326d';
 
 /// Start the bonsoir broadcast on a free port
 ///
@@ -25,7 +25,24 @@ final startBroadcastProvider = AutoDisposeProvider<void>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef StartBroadcastRef = AutoDisposeProviderRef<void>;
-String _$eventsHash() => r'cf22b922a44cb8e3c5a7cb6448fbec925202423c';
+String _$stopBroadcastHash() => r'b28b83f8778c309f14b91d5f28f60b8e74e32fbe';
+
+/// See also [stopBroadcast].
+@ProviderFor(stopBroadcast)
+final stopBroadcastProvider = AutoDisposeProvider<void>.internal(
+  stopBroadcast,
+  name: r'stopBroadcastProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$stopBroadcastHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef StopBroadcastRef = AutoDisposeProviderRef<void>;
+String _$eventsHash() => r'1029274ac2a81d324e1204050d515a66dbc0b758';
 
 /// Stream provider that listens to bonsoir events
 ///

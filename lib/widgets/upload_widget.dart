@@ -57,7 +57,6 @@ class _UploadWidgetState extends State<UploadWidget> {
     return Row(
       children: [
         SizedBox(width: 200, child: LinearProgressIndicator(value: _progress)),
-        Text('${widget.client.port}'),
         IconButton(
           onPressed: _uploadFile,
           icon: const Icon(Icons.upload),

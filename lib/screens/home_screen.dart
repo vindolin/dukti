@@ -84,11 +84,11 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
       body: const Center(
         child: ClientList(),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {},
-        tooltip: 'Refresh',
-        child: const Icon(Icons.refresh),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () async {},
+      //   tooltip: 'Refresh',
+      //   child: const Icon(Icons.refresh),
+      // ),
     );
   }
 }

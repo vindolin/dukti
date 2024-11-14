@@ -18,21 +18,27 @@ part 'bonjour_service.g.dart';
 
 const duktiServiceType = '_dukti._tcp';
 
+final _service = bonsoir.BonsoirService(
+  name: clientName,
+  type: duktiServiceType,
+  port: server_port_service.serverPort!,
+  attributes: {
+    'platform': Platform.operatingSystem,
+  },
+);
+
+bonsoir.BonsoirBroadcast _broadcast = bonsoir.BonsoirBroadcast(service: _service);
+
 /// Start the bonsoir broadcast on a free port
 @riverpod
 void startBroadcast(Ref ref) async {
-  final service = bonsoir.BonsoirService(
-    name: clientName,
-    type: duktiServiceType,
-    port: server_port_service.serverPort!,
-    attributes: {
-      'platform': Platform.operatingSystem,
-    },
-  );
+  await _broadcast.ready;
+  await _broadcast.start();
+}
 
-  bonsoir.BonsoirBroadcast broadcast = bonsoir.BonsoirBroadcast(service: service);
-  await broadcast.ready;
-  await broadcast.start();
+@riverpod
+void stopBroadcast(Ref ref) async {
+  await _broadcast.stop();
 }
 
 /// Stream provider that listens to bonsoir events
@@ -40,7 +46,7 @@ void startBroadcast(Ref ref) async {
 Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
   final discovery = bonsoir.BonsoirDiscovery(type: duktiServiceType);
 
-  final clients = ref.read(duktiClientsProvider.notifier);
+  final clients = ref.watch(duktiClientsProvider.notifier);
   await discovery.ready;
   discovery.start();
 
@@ -50,8 +56,8 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
       switch (event.type) {
         // found a service, lets resolve it
         case bonsoir.BonsoirDiscoveryEventType.discoveryServiceFound:
-          logger.i('Service found : ${event.service?.name}');
-          event.service?.resolve(discovery.serviceResolver);
+          logger.i('Service found : ${event.service!.name}');
+          await event.service!.resolve(discovery.serviceResolver);
           break;
 
         // resolved a service, add it to the clients provider

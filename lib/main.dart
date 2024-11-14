@@ -3,12 +3,12 @@ import 'package:dukti/services/clipboard_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 
-import 'screens/home_screen.dart';
-import 'services/bonjour_service.dart' as bonsoir_service;
-import 'services/server_port_service.dart';
+import '/screens/home_screen.dart';
+import '/services/bonjour_service.dart' as bonsoir_service;
+import '/services/server_port_service.dart';
 // import 'services/socket_service.dart' as socket_service;
-import 'models/client_name.dart';
-import 'services/webserver_service.dart';
+import '/models/client_name.dart';
+import '/services/webserver_service.dart';
 
 import '/logger.dart';
 
@@ -20,11 +20,11 @@ import '/logger.dart';
 */
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   await getPort();
   logger.e('Using port $serverPort');
   await initClientName();
-
-  WidgetsFlutterBinding.ensureInitialized();
 
   runApp(
     const ProviderScope(
