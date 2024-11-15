@@ -1,12 +1,10 @@
-// ignore_for_file: avoid_print
 import 'package:dukti/services/clipboard_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 
 import '/screens/home_screen.dart';
-import '/services/bonjour_service.dart' as bonsoir_service;
+import '/services/bonjour_service.dart' as bonsoir;
 import '/services/server_port_service.dart';
-// import 'services/socket_service.dart' as socket_service;
 import '/models/client_name.dart';
 import '/services/webserver_service.dart';
 
@@ -19,12 +17,51 @@ import '/logger.dart';
   see: https://stackoverflow.com/questions/69952232/handling-dispose-method-when-using-hot-restart
 */
 
+class AppLifecycleManager extends StatefulWidget {
+  final Widget child;
+
+  const AppLifecycleManager({super.key, required this.child});
+
+  @override
+  AppLifecycleManagerState createState() => AppLifecycleManagerState();
+}
+
+class AppLifecycleManagerState extends State<AppLifecycleManager> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    // Perform cleanup here
+    // For example, stop servers, close streams, etc.
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.detached) {
+      // The app is exiting
+      // Perform cleanup if needed
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await getPort();
   logger.e('Using port $serverPort');
   await initClientName();
+  bonsoir.startBroadcast();
 
   runApp(
     const ProviderScope(
@@ -41,13 +78,8 @@ class DuktiApp extends ConsumerWidget {
     logger.t('Building DuktiApp');
 
     ref.watch(clipboardServiceProvider);
-    ref.watch(startWebServerProvider(serverPort!)); // start the web server
-    ref.watch(bonsoir_service.eventsProvider); // start listening to events
-    ref.watch(bonsoir_service.startBroadcastProvider); // broadcasting our dukti service
-    // final socketEventStream = ref.watch(socket_service.socketEventsProvider);
-    // logger.e(socketEventStream.value?.data);
-
-    // startServer(ref);
+    ref.watch(startWebServerProvider(serverPort!));
+    ref.watch(bonsoir.eventsProvider);
 
     return MaterialApp(
       title: 'Dukti',

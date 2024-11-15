@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import '/models/client_name.dart';
+import '/services/bonjour_service.dart';
 import '/services/clipboard_service.dart';
 import '/widgets/client_list_widget.dart';
 
@@ -84,11 +85,13 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
       body: const Center(
         child: ClientList(),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () async {},
-      //   tooltip: 'Refresh',
-      //   child: const Icon(Icons.refresh),
-      // ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          stopBroadcast();
+        },
+        tooltip: 'Stop broadcasting',
+        child: const Icon(Icons.close),
+      ),
     );
   }
 }

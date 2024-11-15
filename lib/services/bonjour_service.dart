@@ -30,14 +30,13 @@ final _service = bonsoir.BonsoirService(
 bonsoir.BonsoirBroadcast _broadcast = bonsoir.BonsoirBroadcast(service: _service);
 
 /// Start the bonsoir broadcast on a free port
-@riverpod
-void startBroadcast(Ref ref) async {
+startBroadcast() async {
+  logger.e('Starting broadcast');
   await _broadcast.ready;
   await _broadcast.start();
 }
 
-@riverpod
-void stopBroadcast(Ref ref) async {
+stopBroadcast() async {
   await _broadcast.stop();
 }
 
@@ -45,8 +44,7 @@ void stopBroadcast(Ref ref) async {
 @riverpod
 Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
   final discovery = bonsoir.BonsoirDiscovery(type: duktiServiceType);
-
-  final clients = ref.watch(duktiClientsProvider.notifier);
+  final clients = ref.read(duktiClientsProvider.notifier);
   await discovery.ready;
   discovery.start();
 
@@ -57,7 +55,8 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
         // found a service, lets resolve it
         case bonsoir.BonsoirDiscoveryEventType.discoveryServiceFound:
           logger.i('Service found : ${event.service!.name}');
-          await event.service!.resolve(discovery.serviceResolver);
+
+          event.service!.resolve(discovery.serviceResolver);
           break;
 
         // resolved a service, add it to the clients provider
