@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:animated_list_plus/animated_list_plus.dart';
 
 import '/models/client_provider.dart';
 import '/screens/client_screen.dart';
@@ -14,39 +15,57 @@ class ClientList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final clients = ref.watch(duktiClientsProvider); // clients are dependent on the events provider further up
+    final clients = ref.watch(duktiClientsProvider);
 
-    return ListView.builder(
-      itemCount: clients.length,
-      itemBuilder: (context, index) {
-        final entry = clients.entries.elementAt(index);
+    return ImplicitlyAnimatedList<MapEntry<String, DuktiClient>>(
+      items: clients.entries.toList(),
+      areItemsTheSame: (oldItem, newItem) => oldItem.key == newItem.key,
+      itemBuilder: (context, animation, entry, index) {
         final client = entry.value;
 
-        return ListTile(
-          leading: client.platform != null
-              ? PlatformIcon(platform: client.platform!)
-              : SizedBox(width: 24, height: 24, child: CircularProgressIndicator()),
-          title: Text(entry.key),
-          subtitle: RichText(
+        return FadeTransition(
+          opacity: animation,
+          child: ListTile(
+            leading: client.platform != null
+                ? PlatformIcon(platform: client.platform!)
+                : SizedBox(width: 24, height: 24, child: CircularProgressIndicator()),
+            title: Text(client.name),
+            subtitle: RichText(
               text: TextSpan(
-            children: client.ip != null
-                ? [
-                    TextSpan(text: client.ip, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-                    TextSpan(text: ':${client.port}', style: const TextStyle(color: Colors.green)),
-                    TextSpan(text: ' (${client.host})', style: const TextStyle(color: Colors.grey)),
-                  ]
-                : [
-                    const TextSpan(text: 'resolving...', style: TextStyle(color: Colors.red)),
-                  ],
-          )),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ClientScreen(client: client),
+                children: client.ip != null
+                    ? [
+                        TextSpan(
+                          text: client.ip,
+                          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                        ),
+                        TextSpan(
+                          text: ':${client.port}',
+                          style: const TextStyle(color: Colors.green),
+                        ),
+                        TextSpan(
+                          text: ' (${client.host})',
+                          style: const TextStyle(color: Colors.grey),
+                        )
+                      ]
+                    : [
+                        const TextSpan(
+                          text: 'resolving...',
+                          style: TextStyle(color: Colors.red),
+                        )
+                      ],
               ),
-            );
-          },
+            ),
+            onTap: client.ip != null
+                ? () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ClientScreen(client: client),
+                      ),
+                    );
+                  }
+                : null,
+          ),
         );
       },
     );
