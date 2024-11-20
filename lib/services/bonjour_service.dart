@@ -52,6 +52,7 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
   await discovery.start();
 
   var allEvents = <bonsoir.BonsoirDiscoveryEvent>[];
+
   await for (final event in discovery.eventStream!) {
     switch (event.type) {
       // found a service, resolve it
@@ -66,7 +67,12 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
             name: name,
           );
           clients.set(name, client);
-          event.service?.resolve(discovery.serviceResolver);
+
+          // resolve this client
+          Future.delayed(Duration(milliseconds: 1000), () {
+            // if we resolve too quickly, the client might not be ready
+            event.service?.resolve(discovery.serviceResolver);
+          });
         }
         break;
 
