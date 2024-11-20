@@ -18,6 +18,7 @@ class DuktiHome extends ConsumerStatefulWidget {
 
 class _DuktiHomeState extends ConsumerState<DuktiHome> {
   FToast? fToast;
+  bool isBroadcasting = true;
 
   //TODO: use ScaffoldMessenger instead of FToast
 
@@ -81,17 +82,28 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(clientName),
+        actions: [
+          Switch(
+            value: isBroadcasting,
+            onChanged: (value) {
+              setState(() {
+                isBroadcasting = value;
+                isBroadcasting ? startBroadcast() : stopBroadcast();
+              });
+            },
+          ),
+        ],
       ),
       body: const Center(
         child: ClientList(),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          stopBroadcast();
-        },
-        tooltip: 'Stop broadcasting',
-        child: const Icon(Icons.close),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () async {
+      //     stopBroadcast();
+      //   },
+      //   tooltip: 'Stop broadcasting',
+      //   child: const Icon(Icons.close),
+      // ),
     );
   }
 }

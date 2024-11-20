@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,85 +28,94 @@ final _service = bonsoir.BonsoirService(
   },
 );
 
-bonsoir.BonsoirBroadcast _broadcast = bonsoir.BonsoirBroadcast(service: _service);
+bonsoir.BonsoirBroadcast? _broadcast;
 
 /// Start the bonsoir broadcast on a free port
 startBroadcast() async {
+  _broadcast = bonsoir.BonsoirBroadcast(service: _service);
   logger.e('Starting broadcast');
-  await _broadcast.ready;
-  await _broadcast.start();
+  await _broadcast?.ready;
+  await _broadcast?.start();
 }
 
 stopBroadcast() async {
-  await _broadcast.stop();
+  await _broadcast?.stop();
 }
 
 /// Stream provider that listens to bonsoir events
 @riverpod
 Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
-  final discovery = bonsoir.BonsoirDiscovery(type: duktiServiceType);
+  logger.i('Starting bonsoir discovery');
+  final discovery = bonsoir.BonsoirDiscovery(type: duktiServiceType, printLogs: false);
   final clients = ref.read(duktiClientsProvider.notifier);
   await discovery.ready;
-  discovery.start();
+  await discovery.start();
 
   var allEvents = <bonsoir.BonsoirDiscoveryEvent>[];
-  if (discovery.eventStream != null) {
-    await for (final event in discovery.eventStream!) {
-      switch (event.type) {
-        // found a service, lets resolve it
-        case bonsoir.BonsoirDiscoveryEventType.discoveryServiceFound:
-          logger.i('Service found : ${event.service!.name}');
+  await for (final event in discovery.eventStream!) {
+    switch (event.type) {
+      // found a service, resolve it
+      case bonsoir.BonsoirDiscoveryEventType.discoveryServiceFound:
+        logger.i('Service found : ${event.service?.name}');
 
-          event.service!.resolve(discovery.serviceResolver);
-          break;
+        final String? name = event.service?.name;
 
-        // resolved a service, add it to the clients provider
-        case bonsoir.BonsoirDiscoveryEventType.discoveryServiceResolved:
-          logger.i('Service resolved : ${event.service?.name}');
+        // ignore self
+        if (name != null && name != clientName) {
+          DuktiClient client = DuktiClient(
+            name: name,
+          );
+          clients.set(name, client);
+          event.service?.resolve(discovery.serviceResolver);
+        }
+        break;
 
-          final json = event.service?.toJson();
-          final String? name = event.service?.name;
-          final String? host = json?['service.host'];
+      // resolved a service, add it to the clients provider
+      case bonsoir.BonsoirDiscoveryEventType.discoveryServiceResolved:
+        logger.i('Service resolved : ${event.service?.name}');
 
-          // only add it if it's not the current client
-          if (name != null && host != null && name != clientName) {
-            final platformString = json?['service.attributes']['platform'];
-            final ClientPlatform platform = ClientPlatform.values.firstWhere(
-              (e) => e.name == platformString,
-              orElse: () => ClientPlatform.flutter,
-            );
+        final json = event.service?.toJson();
+        final String? name = event.service?.name;
+        final String? host = json?['service.host'];
 
-            DuktiClient client = DuktiClient(
-              name: name,
-              host: host,
-              ip: await lookupIP4(host),
-              port: json?['service.port'],
-              platform: platform,
-            );
-            clients.set(name, client);
-          }
+        // ignore self
+        if (name != null && host != null && name != clientName) {
+          final platformString = json?['service.attributes']['platform'];
+          final ClientPlatform platform = ClientPlatform.values.firstWhere(
+            (e) => e.name == platformString,
+            orElse: () => ClientPlatform.flutter,
+          );
 
-          // we don't use those directly, use the clients map instead
-          allEvents = [...allEvents, event];
-          yield allEvents;
-          break;
+          DuktiClient client = DuktiClient(
+            name: name,
+            host: host,
+            ip: await lookupIP4(host),
+            port: json?['service.port'],
+            platform: platform,
+          );
+          clients.set(name, client);
+        } else {
+          logger.e('Ignoring self');
+        }
 
-        // lost a service
-        case bonsoir.BonsoirDiscoveryEventType.discoveryServiceLost:
-          logger.i('Service lost : ${event.service?.name}');
+        // we don't use those directly, use the clients map instead
+        allEvents = [...allEvents, event];
+        yield allEvents;
+        break;
 
-          // remove the client from the clients provider
-          final String? name = event.service?.name;
-          if (name != null) {
-            clients.remove(name);
-          }
-          break;
+      // lost a service
+      case bonsoir.BonsoirDiscoveryEventType.discoveryServiceLost:
+        logger.i('Service lost : ${event.service?.name}');
 
-        default:
-          break;
-      }
+        // remove the client from the clients provider
+        final String? name = event.service?.name;
+        if (name != null) {
+          clients.remove(name);
+        }
+        break;
+
+      default:
+        break;
     }
-  } else {
-    throw 'no clients yet';
   }
 }

@@ -6,22 +6,22 @@ part 'client_model.g.dart';
 
 class DuktiClient {
   final String name;
-  final String host;
-  final String ip;
-  final int port;
-  final ClientPlatform platform;
+  final String? host;
+  final String? ip;
+  final int? port;
+  final ClientPlatform? platform;
 
   DuktiClient({
     required this.name,
-    required this.host,
-    required this.ip,
-    required this.port,
-    required this.platform,
+    this.host,
+    this.ip,
+    this.port,
+    this.platform,
   });
 }
 
 ///  Provider that holds the clients discovered by bonsoir
-@riverpod
+@Riverpod(keepAlive: true)
 class DuktiClients extends _$DuktiClients {
   @override
   Map<String, DuktiClient> build() {
