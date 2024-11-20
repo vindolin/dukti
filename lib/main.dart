@@ -57,7 +57,6 @@ class AppLifecycleManagerState extends State<AppLifecycleManager> with WidgetsBi
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await getPort();
   logger.e('Using port $serverPort');
   await initClientName();

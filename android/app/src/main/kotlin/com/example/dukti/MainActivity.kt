@@ -1,4 +1,4 @@
-package com.example.dukti
+package com.atomar.dukti
 
 import io.flutter.embedding.android.FlutterActivity
 

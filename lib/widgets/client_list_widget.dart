@@ -5,7 +5,7 @@ import '/models/client_provider.dart';
 import '/screens/client_screen.dart';
 import '/widgets/platform_icon_widget.dart';
 
-import '/logger.dart';
+// import '/logger.dart';
 
 class ClientList extends ConsumerWidget {
   const ClientList({
@@ -23,15 +23,21 @@ class ClientList extends ConsumerWidget {
         final client = entry.value;
 
         return ListTile(
-          leading: PlatformIcon(platform: client.platform),
+          leading: client.platform != null
+              ? PlatformIcon(platform: client.platform!)
+              : SizedBox(width: 24, height: 24, child: CircularProgressIndicator()),
           title: Text(entry.key),
           subtitle: RichText(
               text: TextSpan(
-            children: [
-              TextSpan(text: client.ip, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-              TextSpan(text: ':${client.port}', style: const TextStyle(color: Colors.green)),
-              TextSpan(text: ' (${client.host})', style: const TextStyle(color: Colors.grey)),
-            ],
+            children: client.ip != null
+                ? [
+                    TextSpan(text: client.ip, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                    TextSpan(text: ':${client.port}', style: const TextStyle(color: Colors.green)),
+                    TextSpan(text: ' (${client.host})', style: const TextStyle(color: Colors.grey)),
+                  ]
+                : [
+                    const TextSpan(text: 'resolving...', style: TextStyle(color: Colors.red)),
+                  ],
           )),
           onTap: () {
             Navigator.push(
