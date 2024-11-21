@@ -25,46 +25,58 @@ class ClientList extends ConsumerWidget {
 
         return FadeTransition(
           opacity: animation,
-          child: ListTile(
-            leading: client.platform != null
-                ? PlatformIcon(platform: client.platform!)
-                : SizedBox(width: 24, height: 24, child: CircularProgressIndicator()),
-            title: Text(client.name),
-            subtitle: RichText(
-              text: TextSpan(
-                children: client.ip != null
-                    ? [
-                        TextSpan(
-                          text: client.ip,
-                          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                        ),
-                        TextSpan(
-                          text: ':${client.port}',
-                          style: const TextStyle(color: Colors.green),
-                        ),
-                        TextSpan(
-                          text: ' (${client.host})',
-                          style: const TextStyle(color: Colors.grey),
-                        )
-                      ]
-                    : [
-                        const TextSpan(
-                          text: 'resolving...',
-                          style: TextStyle(color: Colors.red),
-                        )
-                      ],
+          child: Column(
+            children: [
+              ListTile(
+                leading: client.platform != null
+                    ? PlatformIcon(platform: client.platform!)
+                    : SizedBox(width: 24, height: 24, child: CircularProgressIndicator()),
+                title: Text(
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                    client.name),
+                subtitle: RichText(
+                  text: TextSpan(
+                    children: client.ip != null
+                        ? [
+                            TextSpan(
+                              text: client.ip,
+                              style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                            ),
+                            TextSpan(
+                              text: ':${client.port}',
+                              style: const TextStyle(color: Colors.green),
+                            ),
+                            TextSpan(
+                              text: ' (${client.host})',
+                              style: const TextStyle(color: Colors.grey),
+                            )
+                          ]
+                        : [
+                            const TextSpan(
+                              text: 'resolving...',
+                              style: TextStyle(color: Colors.black),
+                            )
+                          ],
+                  ),
+                ),
+                onTap: client.ip != null
+                    ? () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ClientScreen(client: client),
+                          ),
+                        );
+                      }
+                    : null,
               ),
-            ),
-            onTap: client.ip != null
-                ? () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ClientScreen(client: client),
-                      ),
-                    );
-                  }
-                : null,
+              const Divider(
+                height: 0,
+              ),
+            ],
           ),
         );
       },

@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,6 +14,18 @@ import '/logger.dart';
 import '/services/clipboard_service.dart';
 
 part 'webserver_service.g.dart';
+
+@Riverpod(keepAlive: true)
+class ReceiveProgress extends _$ReceiveProgress {
+  @override
+  double build() {
+    return 0.0;
+  }
+
+  void set(double progress) {
+    state = progress;
+  }
+}
 
 @riverpod
 Future<void> startWebServer(Ref ref, int port) async {
@@ -31,6 +45,7 @@ Future<void> startWebServer(Ref ref, int port) async {
 
 Future<Response> _handleRequest(Request request, Ref ref) async {
   final clipboardService = ref.watch(clipboardServiceProvider.notifier);
+  final receiveProgress = ref.read(receiveProgressProvider.notifier);
 
   if (request.method == 'POST') {
     // both upload and clipboard requests are POST requests
@@ -41,21 +56,42 @@ Future<Response> _handleRequest(Request request, Ref ref) async {
         // parse the multipart request
         final boundary = contentType.split('boundary=')[1];
         final transformer = MimeMultipartTransformer(boundary);
-        final bodyStream = request.read();
-        final parts = await transformer.bind(bodyStream).toList();
+
+        // Get total content length
+        final contentLength = int.tryParse(request.headers['content-length'] ?? '0') ?? 0;
+        int bytesReceived = 0;
+
+        // Monitor the request body stream
+        final monitoredStream = request.read().transform(
+          StreamTransformer<Uint8List, Uint8List>.fromHandlers(
+            handleData: (Uint8List data, EventSink<Uint8List> sink) {
+              bytesReceived += data.length;
+              // Update the progress
+              double progress = bytesReceived / contentLength;
+              receiveProgress.set(progress);
+              sink.add(data);
+            },
+          ),
+        );
+
+        final parts = await transformer.bind(monitoredStream).toList();
 
         for (var part in parts) {
           final contentDisposition = part.headers['content-disposition']!;
           final filename = RegExp(r'filename="(.+)"').firstMatch(contentDisposition)!.group(1);
           final directory = await getApplicationDocumentsDirectory();
           final file = File('${directory.path}/$filename');
-          await file.writeAsBytes(
-            await part.toList().then(
-                  (data) => data.expand((x) => x).toList(),
-                ),
+
+          // Collect the data from the part
+          final content = await part.fold<Uint8List>(
+            Uint8List(0),
+            (previous, element) => Uint8List.fromList([...previous, ...element]),
           );
+
+          await file.writeAsBytes(content);
           logger.i('File saved: ${file.path}');
         }
+        receiveProgress.set(1.0);
         return Response.ok('File uploaded');
       } else {
         return Response(400, body: 'Invalid content type');

@@ -6,6 +6,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import '/models/client_name.dart';
 import '/services/bonjour_service.dart';
 import '/services/clipboard_service.dart';
+import '/services/server_port_service.dart';
+import '/services/webserver_service.dart';
 import '/widgets/client_list_widget.dart';
 
 class DuktiHome extends ConsumerStatefulWidget {
@@ -21,7 +23,6 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
   bool isBroadcasting = true;
 
   //TODO: use ScaffoldMessenger instead of FToast
-
   @override
   initState() {
     super.initState();
@@ -67,6 +68,7 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
   @override
   Widget build(BuildContext context) {
     final clipboardStream = ref.watch(clipboardServiceProvider);
+    final receiveProgress = ref.watch(receiveProgressProvider);
 
     // show snackbar on socket event
     if (clipboardStream.hasValue) {
@@ -81,7 +83,7 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(clientName),
+        title: Text('$clientUniqueName:$serverPort'),
         actions: [
           Switch(
             value: isBroadcasting,
@@ -104,6 +106,11 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
       //   tooltip: 'Stop broadcasting',
       //   child: const Icon(Icons.close),
       // ),
+      bottomNavigationBar: SizedBox(
+        width: double.infinity,
+        height: 50,
+        child: LinearProgressIndicator(value: receiveProgress),
+      ),
     );
   }
 }
