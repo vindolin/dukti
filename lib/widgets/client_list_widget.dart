@@ -1,3 +1,4 @@
+import 'package:animated_list_plus/transitions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:animated_list_plus/animated_list_plus.dart';
@@ -17,14 +18,21 @@ class ClientList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final clients = ref.watch(duktiClientsProvider);
 
+    final clientsList = clients.entries.toList()
+      ..sort(
+        (a, b) => a.value.name.compareTo(b.value.name),
+      );
+
     return ImplicitlyAnimatedList<MapEntry<String, DuktiClient>>(
-      items: clients.entries.toList(),
-      areItemsTheSame: (oldItem, newItem) => oldItem.key == newItem.key,
+      items: clientsList,
+      areItemsTheSame: (a, b) => a.key == b.key,
       itemBuilder: (context, animation, entry, index) {
         final client = entry.value;
 
-        return FadeTransition(
-          opacity: animation,
+        return SizeFadeTransition(
+          sizeFraction: 0.7,
+          curve: Curves.easeInOut,
+          animation: animation,
           child: Column(
             children: [
               ListTile(
@@ -73,9 +81,7 @@ class ClientList extends ConsumerWidget {
                       }
                     : null,
               ),
-              const Divider(
-                height: 0,
-              ),
+              const Divider(height: 0),
             ],
           ),
         );
