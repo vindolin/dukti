@@ -20,7 +20,7 @@ part 'bonjour_service.g.dart';
 const duktiServiceType = '_dukti._tcp';
 
 final _service = bonsoir.BonsoirService(
-  name: clientName,
+  name: clientUniqueName,
   type: duktiServiceType,
   port: server_port_service.serverPort!,
   attributes: {
@@ -62,7 +62,7 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
         final String? name = event.service?.name;
 
         // ignore self
-        if (name != null && name != clientName) {
+        if (name != null && name != clientUniqueName) {
           DuktiClient client = DuktiClient(
             name: name,
           );
@@ -85,7 +85,7 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
         final String? host = json?['service.host'];
 
         // ignore self
-        if (name != null && host != null && name != clientName) {
+        if (name != null && host != null && name != clientUniqueName) {
           final platformString = json?['service.attributes']['platform'];
           final ClientPlatform platform = ClientPlatform.values.firstWhere(
             (e) => e.name == platformString,
