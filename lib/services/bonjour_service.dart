@@ -9,7 +9,7 @@ import 'package:bonsoir/bonsoir.dart' as bonsoir;
 
 import '/platform_helper.dart';
 import '/models/client_provider.dart';
-import '/network_helper.dart' show lookupIP4;
+import '/network_helper.dart' show lookupIP4, knockPort;
 import '/models/client_name.dart';
 import '/services/server_port_service.dart' as server_port_service;
 
@@ -31,15 +31,35 @@ final _service = bonsoir.BonsoirService(
 bonsoir.BonsoirBroadcast? _broadcast;
 
 /// Start the bonsoir broadcast on a free port
-startBroadcast() async {
+void startBroadcast() async {
   _broadcast = bonsoir.BonsoirBroadcast(service: _service);
   logger.e('Starting broadcast');
   await _broadcast?.ready;
   await _broadcast?.start();
 }
 
-stopBroadcast() async {
+void stopBroadcast() async {
   await _broadcast?.stop();
+}
+
+Timer? _staleClientTimer;
+
+void removeStaleClients(Ref ref) {
+  _staleClientTimer ??= Timer.periodic(
+    Duration(seconds: 30),
+    (timer) async {
+      final clients = ref.read(duktiClientsProvider);
+
+      for (var client in clients.values) {
+        if (client.ip != null && client.port != null) {
+          if (!await knockPort(client.ip!, client.port!)) {
+            clients.remove(client.name);
+            logger.i('Client ${client.name}@${client.host}:${client.port} is offline and has been removed.');
+          }
+        }
+      }
+    },
+  );
 }
 
 /// Stream provider that listens to bonsoir events
@@ -48,8 +68,10 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
   logger.i('Starting bonsoir discovery');
   final discovery = bonsoir.BonsoirDiscovery(type: duktiServiceType, printLogs: false);
   final clients = ref.read(duktiClientsProvider.notifier);
+
+  removeStaleClients(ref);
   await discovery.ready;
-  await discovery.start();
+  discovery.start();
 
   var allEvents = <bonsoir.BonsoirDiscoveryEvent>[];
 
@@ -87,6 +109,15 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
         // ignore self
         if (name != null && host != null && name != clientUniqueName) {
           final platformString = json?['service.attributes']['platform'];
+          final port = json?['service.port'];
+          final ip = await lookupIP4(host);
+
+          // check if the client is still alive
+          if (!await knockPort(ip, port)) {
+            logger.t('Resolved dead client: $name $ip:$port');
+            break;
+          }
+
           final ClientPlatform platform = ClientPlatform.values.firstWhere(
             (e) => e.name == platformString,
             orElse: () => ClientPlatform.flutter,
@@ -95,8 +126,8 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
           DuktiClient client = DuktiClient(
             name: name,
             host: host,
-            ip: await lookupIP4(host),
-            port: json?['service.port'],
+            ip: ip,
+            port: port,
             platform: platform,
           );
           clients.set(name, client);
