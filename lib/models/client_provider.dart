@@ -10,6 +10,7 @@ class DuktiClient {
   final String? ip;
   final int? port;
   final ClientPlatform? platform;
+  final DateTime? lastSeen;
 
   DuktiClient({
     required this.name,
@@ -17,7 +18,7 @@ class DuktiClient {
     this.ip,
     this.port,
     this.platform,
-  });
+  }) : lastSeen = DateTime.now();
 }
 
 ///  Provider that holds the clients discovered by bonsoir
@@ -41,5 +42,9 @@ class DuktiClients extends _$DuktiClients {
 
   void remove(String name) {
     state = Map.from(state)..remove(name);
+  }
+
+  void clear() {
+    state = {};
   }
 }
