@@ -173,5 +173,21 @@ final receiveProgressProvider =
 );
 
 typedef _$ReceiveProgress = Notifier<double>;
+String _$uploadInProgressHash() => r'007ed498fb63c01937193eb6c1148c6aeb7b9153';
+
+/// See also [UploadInProgress].
+@ProviderFor(UploadInProgress)
+final uploadInProgressProvider =
+    AutoDisposeNotifierProvider<UploadInProgress, bool>.internal(
+  UploadInProgress.new,
+  name: r'uploadInProgressProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$uploadInProgressHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$UploadInProgress = AutoDisposeNotifier<bool>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
