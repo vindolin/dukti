@@ -1,4 +1,4 @@
-import 'dart:io' show InternetAddress, InternetAddressType, RawServerSocket, ServerSocket, SocketException;
+import 'dart:io' show InternetAddress, InternetAddressType, RawServerSocket, ServerSocket, Socket, SocketException;
 import 'dart:async';
 
 lookupIP4(String host) async {
@@ -60,4 +60,15 @@ Future<T> getUnusedPort<T extends Object>(FutureOr<T> Function(int port) tryPort
     return value == null;
   });
   return value!;
+}
+
+/// Try to open a client port to check if it's still alive
+Future<bool> knockPort(String ip, int port) async {
+  try {
+    final socket = await Socket.connect(ip, port, timeout: Duration(seconds: 1));
+    socket.destroy();
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
