@@ -1,3 +1,4 @@
+import 'package:dukti/models/client_provider.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,8 @@ import '/services/clipboard_service.dart';
 import '/services/server_port_service.dart';
 import '/services/webserver_service.dart';
 import '/widgets/client_list_widget.dart';
+
+import '/logger.dart';
 
 class DuktiHome extends ConsumerStatefulWidget {
   final String title;
@@ -67,6 +70,7 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
 
   @override
   Widget build(BuildContext context) {
+    logger.t('Building DuktiHome');
     final clipboardStream = ref.watch(clipboardServiceProvider);
     final receiveProgress = ref.watch(receiveProgressProvider);
 
@@ -93,6 +97,20 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
                 isBroadcasting ? startBroadcast() : stopBroadcast();
               });
             },
+          ),
+          // button that restarts the discovery
+          IconButton(
+            onPressed: () {
+              ref.read(duktiClientsProvider.notifier).clear();
+              ref.invalidate(eventsProvider);
+            },
+            icon: const Icon(shadows: [
+              Shadow(
+                color: Colors.black,
+                offset: Offset(1, 1),
+                blurRadius: 2,
+              ),
+            ], Icons.refresh),
           ),
         ],
       ),
