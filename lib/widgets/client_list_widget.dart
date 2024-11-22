@@ -29,6 +29,9 @@ class ClientList extends ConsumerWidget {
       itemBuilder: (context, animation, entry, index) {
         final client = entry.value;
 
+        /// parse the client.name like "name_68b80958" into clientName, clientId
+        var [clientName, clientId] = client.name.split('_');
+
         return SizeFadeTransition(
           sizeFraction: 0.7,
           curve: Curves.easeInOut,
@@ -39,12 +42,27 @@ class ClientList extends ConsumerWidget {
                 leading: client.platform != null
                     ? PlatformIcon(platform: client.platform!)
                     : SizedBox(width: 24, height: 24, child: CircularProgressIndicator()),
-                title: Text(
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                    client.name),
+                title: RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                        text: clientName,
+                      ),
+                      TextSpan(
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 18,
+                        ),
+                        text: ' $clientId',
+                      ),
+                    ],
+                  ),
+                ),
                 subtitle: RichText(
                   text: TextSpan(
                     children: client.ip != null
