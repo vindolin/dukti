@@ -1,4 +1,3 @@
-import 'package:dukti/models/client_provider.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
@@ -9,9 +8,9 @@ import '/services/bonjour_service.dart';
 import '/services/clipboard_service.dart';
 import '/services/server_port_service.dart';
 import '/services/webserver_service.dart';
-import '/widgets/client_list_widget.dart';
+import 'client_list/widgets/client_list_widget.dart';
 
-import '/logger.dart';
+import '../utils/logger.dart';
 
 class DuktiHome extends ConsumerStatefulWidget {
   final String title;
@@ -89,19 +88,10 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text('$clientUniqueName:$serverPort'),
         actions: [
-          Switch(
-            value: isBroadcasting,
-            onChanged: (value) {
-              setState(() {
-                isBroadcasting = value;
-                isBroadcasting ? startBroadcast() : stopBroadcast();
-              });
-            },
-          ),
           // button that restarts the discovery
           IconButton(
             onPressed: () {
-              ref.read(duktiClientsProvider.notifier).clear();
+              // ref.read(duktiClientsProvider.notifier).clear();
               ref.invalidate(eventsProvider);
             },
             icon: const Icon(shadows: [
@@ -111,6 +101,15 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
                 blurRadius: 2,
               ),
             ], Icons.refresh),
+          ),
+          Switch(
+            value: isBroadcasting,
+            onChanged: (value) {
+              setState(() {
+                isBroadcasting = value;
+                isBroadcasting ? startBroadcast() : stopBroadcast();
+              });
+            },
           ),
         ],
       ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import '/platform_helper.dart';
+import '../utils/platform_helper.dart';
 
 // Map of platform icons
 const Map<ClientPlatform, IconData> platformIcons = {

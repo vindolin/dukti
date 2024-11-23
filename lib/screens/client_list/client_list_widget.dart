@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:animated_list_plus/animated_list_plus.dart';
 
 import '/models/client_provider.dart';
-import '/screens/client_screen.dart';
+import '/screens/client_list/client_screen.dart';
 import '/widgets/platform_icon_widget.dart';
 
 // import '/logger.dart';
