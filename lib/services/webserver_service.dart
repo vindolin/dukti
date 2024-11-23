@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,6 +11,8 @@ import 'package:path_provider/path_provider.dart';
 
 import '../utils/logger.dart';
 import '/services/clipboard_service.dart';
+import '/models/generic_providers.dart';
+// import '/services/upload_service.dart';
 
 part 'webserver_service.g.dart';
 
@@ -24,16 +25,6 @@ class ReceiveProgress extends _$ReceiveProgress {
 
   void set(double progress) {
     state = progress;
-  }
-}
-
-@riverpod
-class UploadInProgress extends _$UploadInProgress {
-  @override
-  bool build() => false;
-
-  void set(bool value) {
-    state = value;
   }
 }
 
@@ -58,15 +49,15 @@ Future<Response> _handleRequest(Request request, Ref ref) async {
     // both upload and clipboard requests are POST requests
 
     if (request.url.path == 'clipboard') {
-      return handleClipboard(request, ref);
+      return _handleClipboard(request, ref);
     } else if (request.url.path == 'upload') {
-      return handleUpload(request, ref);
+      return _receiveUpload(request, ref);
     }
   }
   return Response.notFound('Not Found');
 }
 
-Future<Response> handleClipboard(Request request, Ref ref) async {
+Future<Response> _handleClipboard(Request request, Ref ref) async {
   final clipboardService = ref.watch(clipboardServiceProvider.notifier);
 
   if (request.method == 'POST') {
@@ -78,12 +69,11 @@ Future<Response> handleClipboard(Request request, Ref ref) async {
   return Response.notFound('Not Found');
 }
 
-Future<Response> handleUpload(Request request, Ref ref) async {
-  final uploadInProgress = ref.watch(uploadInProgressProvider);
-  final uploadInProgressNotifier = ref.read(uploadInProgressProvider.notifier);
-  final receiveProgress = ref.read(receiveProgressProvider.notifier);
+Future<Response> _receiveUpload(Request request, Ref ref) async {
+  final receiveProgressNotifier = ref.read(receiveProgressProvider.notifier);
+  final uploadInProgress = ref.watch(togglerProvider('uploadInProgress'));
 
-// Check if an upload is already in progress
+  // Check if an upload is already in progress
   if (uploadInProgress) {
     return Response(
       429,
@@ -91,58 +81,57 @@ Future<Response> handleUpload(Request request, Ref ref) async {
     );
   }
 
-  // Set the uploadInProgress flag to true
-  uploadInProgressNotifier.set(true);
+  // Set the uploadProgress flag to true
+  ref.read(togglerProvider('uploadInProgress').notifier).set(true);
 
   try {
-    // save the uploaded file to the app's documents directory
     final contentType = request.headers['content-type'];
     if (contentType != null && contentType.startsWith('multipart/form-data')) {
-      // parse the multipart request
+      // Extract boundary from content type
       final boundary = contentType.split('boundary=')[1];
       final transformer = MimeMultipartTransformer(boundary);
 
-      // Get total content length
+      // Parse the multipart request
+      final parts = transformer.bind(request.read());
+
+      // Get content length for progress tracking
       final contentLength = int.tryParse(request.headers['content-length'] ?? '0') ?? 0;
       int bytesReceived = 0;
 
-      // Monitor the request body stream
-      final monitoredStream = request.read().transform(
-        StreamTransformer<Uint8List, Uint8List>.fromHandlers(
-          handleData: (Uint8List data, EventSink<Uint8List> sink) {
-            bytesReceived += data.length;
-            // Update the progress
-            double progress = bytesReceived / contentLength;
-            receiveProgress.set(progress);
-            sink.add(data);
-          },
-        ),
-      );
-
-      final parts = await transformer.bind(monitoredStream).toList();
-
-      for (var part in parts) {
+      // Process each part
+      await for (final part in parts) {
+        // Get filename from content disposition
         final contentDisposition = part.headers['content-disposition']!;
-        final filename = RegExp(r'filename="(.+)"').firstMatch(contentDisposition)!.group(1);
+        final filenameMatch = RegExp(r'filename="([^"]*)"').firstMatch(contentDisposition);
+        final filename = filenameMatch != null ? filenameMatch.group(1) : 'uploaded_file';
+
+        // Create file to write to
         final directory = await getApplicationDocumentsDirectory();
         final file = File('${directory.path}/$filename');
+        final fileSink = file.openWrite();
 
-        // Collect the data from the part
-        final content = await part.fold<Uint8List>(
-          Uint8List(0),
-          (previous, element) => Uint8List.fromList([...previous, ...element]),
-        );
+        // Write data chunks directly to the file
+        await for (final data in part) {
+          bytesReceived += data.length;
+          fileSink.add(data);
 
-        await file.writeAsBytes(content);
+          // Update progress
+          double progress = bytesReceived / contentLength;
+          receiveProgressNotifier.set(progress);
+          logger.i('Upload progress: $progress');
+        }
+
+        await fileSink.close();
         logger.i('File saved: ${file.path}');
       }
-      receiveProgress.set(1.0);
+
+      receiveProgressNotifier.set(1.0);
       return Response.ok('File uploaded');
     } else {
       return Response(400, body: 'Invalid content type');
     }
   } finally {
-    // Set the uploadInProgress flag to false
-    uploadInProgressNotifier.set(false);
+    // Set the uploadProgress flag to false
+    ref.read(togglerProvider('uploadInProgress').notifier).set(false);
   }
 }
