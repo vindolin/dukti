@@ -10,9 +10,9 @@ import '/services/server_port_service.dart';
 import '/models/client_name.dart';
 import '/models/client_provider.dart';
 import '/services/webserver_service.dart';
-import '/platform_helper.dart';
+import 'utils/platform_helper.dart';
 
-import '/logger.dart';
+import 'utils/logger.dart';
 
 /*
   Hot reload sadly does not work with the bonsoir plugin

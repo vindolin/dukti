@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 
-import '/logger.dart';
+import '../utils/logger.dart';
 
 class UploadWidget extends StatefulWidget {
   final DuktiClient client;

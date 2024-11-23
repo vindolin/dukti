@@ -7,13 +7,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:bonsoir/bonsoir.dart' as bonsoir;
 
-import '/platform_helper.dart';
+import '../utils/platform_helper.dart';
 import '/models/client_provider.dart';
-import '/network_helper.dart' show lookupIP4, knockPort;
+import '../utils/network_helper.dart' show lookupIP4, knockPort;
 import '/models/client_name.dart';
 import '/services/server_port_service.dart' as server_port_service;
 
-import '/logger.dart';
+import '../utils/logger.dart';
 
 part 'bonjour_service.g.dart';
 

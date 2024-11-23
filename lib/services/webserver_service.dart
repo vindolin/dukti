@@ -10,7 +10,7 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:path_provider/path_provider.dart';
 
-import '/logger.dart';
+import '../utils/logger.dart';
 import '/services/clipboard_service.dart';
 
 part 'webserver_service.g.dart';

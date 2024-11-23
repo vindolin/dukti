@@ -6,7 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '/models/client_provider.dart';
 
-import '/logger.dart';
+import '../utils/logger.dart';
 
 part 'clipboard_service.g.dart';
 
