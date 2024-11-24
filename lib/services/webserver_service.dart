@@ -93,17 +93,6 @@ Future<Response> _handleClipboard(Request request, Ref ref) async {
 Future<Response> _receiveUpload(Request request, Ref ref) async {
   // final uploadInProgress = ref.watch(togglerProvider('uploadInProgress'));
 
-  // // Check if an upload is already in progress
-  // if (uploadInProgress) {
-  //   return Response(
-  //     429,
-  //     body: 'Another upload is currently in progress. Please wait and try again.',
-  //   );
-  // }
-
-  // // Set the uploadProgress flag to true
-  // ref.read(togglerProvider('uploadInProgress').notifier).set(true);
-
   try {
     final contentType = request.headers['content-type'];
     if (contentType != null && contentType.startsWith('multipart/form-data')) {
