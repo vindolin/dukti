@@ -41,6 +41,8 @@ dev_dependencies:
   riverpod_generator: ^2.4.3
 
 flutter:
+  assets:
+    - assets/images/
 
   uses-material-design: true
 

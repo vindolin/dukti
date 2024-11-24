@@ -32,16 +32,22 @@ class ClientScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text('Client ${client.name}'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Client: ${client.name}'),
-            Text('ID: ${client.id}'),
-            Text('Host: ${client.host}'),
-            Text('IP: ${client.ip}'),
-            Text('Port: ${client.port}'),
-          ],
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Client: ${client.name}'),
+              Text('ID: ${client.id}'),
+              Text(
+                'Host: ${client.host}',
+                overflow: TextOverflow.ellipsis,
+              ),
+              Text('IP: ${client.ip}'),
+              Text('Port: ${client.port}'),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: BottomAppBar(

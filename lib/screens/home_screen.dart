@@ -4,11 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import '/styles/decorations.dart';
 import '/models/client_name.dart';
 import '/services/bonjour_service.dart';
 import '/services/clipboard_service.dart';
-import '/services/server_port_service.dart';
-import '/models/generic_providers.dart';
 import '/services/webserver_service.dart';
 import 'client_list/widgets/client_list_widget.dart';
 
@@ -141,7 +140,8 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
           ),
         ],
       ),
-      body: const Center(
+      body: Container(
+        decoration: fancyBackground,
         child: ClientList(),
       ),
       // floatingActionButton: FloatingActionButton(
