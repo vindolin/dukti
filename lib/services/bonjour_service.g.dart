@@ -6,7 +6,7 @@ part of 'bonjour_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$eventsHash() => r'98a89b23ce78d119459eab0cf198ff0ce53f0727';
+String _$eventsHash() => r'cf843c20b6d8ac31c4bb4239e3905b214876bfc5';
 
 /// Stream provider that listens to bonsoir events
 ///

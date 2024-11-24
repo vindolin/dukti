@@ -17,7 +17,7 @@ class ClientScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final clients = ref.watch(duktiClientsProvider);
 
-    if (!clients.containsKey(client.name)) {
+    if (!clients.containsKey(client.id)) {
       return Scaffold(
         appBar: AppBar(
           title: Text('Client ${client.name}'),

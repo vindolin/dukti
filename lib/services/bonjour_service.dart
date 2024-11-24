@@ -45,7 +45,6 @@ void stopBroadcast() async {
 Timer? _staleClientTimer;
 
 void removeStaleClients(Ref ref) {
-  return;
   _staleClientTimer ??= Timer.periodic(
     Duration(seconds: 30),
     (timer) async {
@@ -54,7 +53,8 @@ void removeStaleClients(Ref ref) {
       for (var client in clients.values) {
         if (client.ip != null && client.port != null) {
           if (!await knockPort(client.ip!, client.port!)) {
-            clients.remove(client.name);
+            // clients.remove(client.name);
+            ref.read(duktiClientsProvider.notifier).remove(client.id);
             logger.i('Client ${client.name}@${client.host}:${client.port} is offline and has been removed.');
           }
         }
@@ -89,6 +89,11 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
   var allEvents = <bonsoir.BonsoirDiscoveryEvent>[];
 
   await for (final event in discovery.eventStream!) {
+    if (event.service == null) {
+      logger.i('Service is null');
+      continue;
+    }
+
     final [name, id, uniqueName] = parseUniqueName(event.service?.name);
     switch (event.type) {
       // found a service, resolve it
