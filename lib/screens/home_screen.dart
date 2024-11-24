@@ -153,7 +153,7 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
       // ),
       bottomNavigationBar: SizedBox(
         width: double.infinity,
-        height: 50,
+        height: 20,
         child: ReceiveProgressWidget(),
       ),
     );
@@ -173,9 +173,7 @@ class ReceiveProgressWidget extends ConsumerWidget {
 
       // if receiveProgress is 100%, start a timer and clear the progress after 1 second
       if (progress == 1.0) {
-        Future.delayed(const Duration(seconds: 1), () {
-          progress = 0.0;
-        });
+        progress = 0.0;
       }
     }
 

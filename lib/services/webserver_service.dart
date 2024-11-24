@@ -178,7 +178,6 @@ Future<Response> _receiveUpload(Request request, Ref ref) async {
       return Response(400, body: 'Invalid content type');
     }
   } catch (e) {
-    rethrow;
     logger.e('Error receiving upload: $e');
     return Response.internalServerError(body: 'Error receiving upload');
   }
