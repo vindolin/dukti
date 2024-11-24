@@ -6,6 +6,7 @@ part 'client_model.g.dart';
 
 class DuktiClient {
   final String name;
+  final String id;
   final String? host;
   final String? ip;
   final int? port;
@@ -14,6 +15,7 @@ class DuktiClient {
 
   DuktiClient({
     required this.name,
+    required this.id,
     this.host,
     this.ip,
     this.port,
@@ -33,6 +35,7 @@ class DuktiClients extends _$DuktiClients {
     state = Map.from(state)
       ..[name] = DuktiClient(
         name: name,
+        id: client.id,
         host: client.host,
         ip: client.ip,
         port: client.port,
