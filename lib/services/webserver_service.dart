@@ -95,7 +95,7 @@ Future<Response> _handleClipboard(Request request, Ref ref) async {
 Future<Response> _receiveUpload(Request request, Ref ref) async {
   try {
     final contentType = request.headers['content-type'];
-    final clientId = request.headers['clientId'];
+
     if (contentType != null && contentType.startsWith('multipart/form-data')) {
       // Extract boundary from content type
       final boundary = contentType.split('boundary=')[1];
@@ -109,53 +109,67 @@ Future<Response> _receiveUpload(Request request, Ref ref) async {
       int bytesReceived = 0;
       final uploadProgress = ref.watch(uploadProgressProvider.notifier);
 
+      String? clientId;
+
       // Process each part
       await for (final part in parts) {
-        // Get filename from content disposition
+        // Get content disposition
         final contentDisposition = part.headers['content-disposition']!;
-        final filenameMatch = RegExp(r'filename="([^"]*)"').firstMatch(contentDisposition);
-        final filename = filenameMatch != null ? filenameMatch.group(1) : 'uploaded_file';
+        final nameMatch = RegExp(r'name="([^"]*)"').firstMatch(contentDisposition);
+        final fieldName = nameMatch?.group(1);
 
-        // Create file to write to
-        final directory = await getApplicationDocumentsDirectory();
-        final file = File('${directory.path}/$filename');
+        if (fieldName == 'file') {
+          // This part is the file
+          final filenameMatch = RegExp(r'filename="([^"]*)"').firstMatch(contentDisposition);
+          final filename = filenameMatch != null ? filenameMatch.group(1) : 'uploaded_file';
 
-        // Create an Upload object and add it to UploadProgressList
-        final upload = Upload(
-          clientId: clientId!,
-          filename: filename!,
-          contentLength: contentLength,
-        );
-
-        try {
+          // Create file to write to
+          final directory = await getApplicationDocumentsDirectory();
+          final file = File('${directory.path}/$filename');
           final fileSink = file.openWrite();
 
-          // Write data chunks directly to the file
-          await for (final data in part) {
-            bytesReceived += data.length;
-            fileSink.add(data);
+          // Create an Upload object and add it to UploadProgressList
+          final upload = Upload(
+            clientId: clientId!,
+            filename: filename!,
+            contentLength: contentLength,
+          );
 
-            // Update progress
-            double progress = bytesReceived / contentLength;
-            upload.progress = progress;
+          try {
+            // Write data chunks directly to the file
+            await for (final data in part) {
+              bytesReceived += data.length;
+              fileSink.add(data);
 
-            // Update the Upload object in the list
+              // Update progress
+              double progress = bytesReceived / contentLength;
+              upload.progress = progress;
+
+              // Update the Upload object in the list
+              uploadProgress.add(filename, upload);
+              logger.i('Upload progress for $filename: $progress');
+            }
+
+            upload.progress = 1.0;
             uploadProgress.add(filename, upload);
-            logger.i('Upload progress for $filename: $progress');
-          }
 
-          await fileSink.close();
-          logger.i('File saved: ${file.path}');
-
-          uploadProgress.remove(filename);
-        } catch (e) {
-          // Delete the partially downloaded file if an error occurs
-          rethrow;
-          if (await file.exists()) {
-            await file.delete();
-            logger.i('Partial file deleted due to error: $e');
+            await fileSink.close();
+            logger.i('File saved: ${file.path}');
+          } catch (e) {
+            // Delete the partially downloaded file if an error occurs
+            if (await file.exists()) {
+              await file.delete();
+              logger.i('Partial file deleted due to error: $e');
+            }
+            rethrow;
           }
-          rethrow;
+        } else if (fieldName == 'clientId') {
+          // This part is the clientId
+          final content = await utf8.decoder.bind(part).join();
+          clientId = content.trim();
+          logger.e('Received clientId: $clientId');
+        } else {
+          // Handle other form fields if necessary
         }
       }
 

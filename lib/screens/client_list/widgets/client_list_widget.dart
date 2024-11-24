@@ -138,9 +138,9 @@ class ClientListTile extends StatelessWidget {
                     ],
             ),
           ),
-          UploadList(
-            client: client,
-          )
+          // UploadList(
+          //   client: client,
+          // )
         ],
       ),
       onTap: client.ip != null
@@ -157,24 +157,24 @@ class ClientListTile extends StatelessWidget {
   }
 }
 
-class UploadList extends ConsumerWidget {
-  final DuktiClient client;
-  const UploadList({super.key, required this.client});
+// class UploadList extends ConsumerWidget {
+//   final DuktiClient client;
+//   const UploadList({super.key, required this.client});
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final uploadProgress = ref.watch(uploadProgressProvider);
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     final uploadProgress = ref.watch(uploadProgressProvider);
 
-    // filter out the upload progress for this client
-    final clientUploadProgress = uploadProgress.entries
-        .where(
-          (upload) => upload.value.clientId == client.id,
-        )
-        .map((e) => e.value)
-        .toList();
+//     // filter out the upload progress for this client
+//     final clientUploadProgress = uploadProgress.entries
+//         .where(
+//           (upload) => upload.value.clientId == client.id,
+//         )
+//         .map((e) => e.value)
+//         .toList();
 
-    print(clientUploadProgress);
+//     print(clientUploadProgress);
 
-    return const Text('xxx');
-  }
-}
+//     return const Text('xxx');
+//   }
+// }
