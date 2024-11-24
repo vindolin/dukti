@@ -23,84 +23,105 @@ class ClientList extends ConsumerWidget {
         (a, b) => a.value.name.compareTo(b.value.name),
       );
 
-    return ImplicitlyAnimatedList<MapEntry<String, DuktiClient>>(
-      items: clientsList,
-      areItemsTheSame: (a, b) => a.key == b.key,
-      itemBuilder: (context, animation, entry, index) {
-        final client = entry.value;
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: ImplicitlyAnimatedList<MapEntry<String, DuktiClient>>(
+          shrinkWrap: true,
+          items: clientsList,
+          areItemsTheSame: (a, b) => a.key == b.key,
+          itemBuilder: (context, animation, entry, index) {
+            final client = entry.value;
 
-        return SizeFadeTransition(
-          sizeFraction: 0.7,
-          curve: Curves.easeInOut,
-          animation: animation,
-          child: Column(
-            children: [
-              ListTile(
-                leading: client.platform != null
-                    ? PlatformIcon(platform: client.platform!)
-                    : SizedBox(width: 24, height: 24, child: CircularProgressIndicator()),
-                title: RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
+            return SizeFadeTransition(
+              sizeFraction: 0.7,
+              curve: Curves.easeInOut,
+              animation: animation,
+              child: Column(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black38,
+                          blurRadius: 1.0,
+                          offset: Offset(1.0, 1.0),
                         ),
-                        text: client.name,
-                      ),
-                      TextSpan(
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 18,
-                        ),
-                        text: ' ${client.id}',
-                      ),
-                    ],
-                  ),
-                ),
-                subtitle: RichText(
-                  text: TextSpan(
-                    children: client.ip != null
-                        ? [
+                      ],
+                    ),
+                    child: ListTile(
+                      leading: client.platform != null
+                          ? PlatformIcon(platform: client.platform!)
+                          : SizedBox(width: 24, height: 24, child: CircularProgressIndicator()),
+                      title: RichText(
+                        text: TextSpan(
+                          children: [
                             TextSpan(
-                              text: client.ip,
-                              style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                              text: client.name,
                             ),
                             TextSpan(
-                              text: ':${client.port}',
-                              style: const TextStyle(color: Colors.green),
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 18,
+                              ),
+                              text: ' ${client.id}',
                             ),
-                            TextSpan(
-                              text: ' (${client.host})',
-                              style: const TextStyle(color: Colors.grey),
-                            )
-                          ]
-                        : [
-                            const TextSpan(
-                              text: 'resolving...',
-                              style: TextStyle(color: Colors.black),
-                            )
                           ],
+                        ),
+                      ),
+                      subtitle: RichText(
+                        text: TextSpan(
+                          children: client.ip != null
+                              ? [
+                                  TextSpan(
+                                    text: client.ip,
+                                    style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                                  ),
+                                  TextSpan(
+                                    text: ':${client.port}',
+                                    style: const TextStyle(color: Colors.green),
+                                  ),
+                                  TextSpan(
+                                    text: ' (${client.host})',
+                                    style: const TextStyle(color: Colors.grey),
+                                  )
+                                ]
+                              : [
+                                  const TextSpan(
+                                    text: 'resolving...',
+                                    style: TextStyle(color: Colors.black),
+                                  )
+                                ],
+                        ),
+                      ),
+                      onTap: client.ip != null
+                          ? () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ClientScreen(client: client),
+                                ),
+                              );
+                            }
+                          : null,
+                    ),
                   ),
-                ),
-                onTap: client.ip != null
-                    ? () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ClientScreen(client: client),
-                          ),
-                        );
-                      }
-                    : null,
+                  // const Divider(height: 0),
+                ],
               ),
-              const Divider(height: 0),
-            ],
-          ),
-        );
-      },
+            );
+          },
+        ),
+      ),
     );
   }
 }
