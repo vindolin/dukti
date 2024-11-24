@@ -141,7 +141,7 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
         ],
       ),
       body: Container(
-        decoration: fancyBackground,
+        decoration: fancyBackground(useDarkTheme),
         child: ClientList(),
       ),
       // floatingActionButton: FloatingActionButton(
