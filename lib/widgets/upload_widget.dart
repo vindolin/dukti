@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 
+import '/models/client_name.dart';
 import '/models/client_provider.dart';
-
-import '../utils/logger.dart';
+import '/utils/logger.dart';
 
 class UploadWidget extends StatefulWidget {
   final DuktiClient client;
@@ -38,15 +38,16 @@ class _UploadWidgetState extends State<UploadWidget> {
       final address = 'http://${widget.client.ip}:${widget.client.port}/upload';
 
       try {
-        await dio.post(
-          address,
-          data: formData,
-          onSendProgress: (int sent, int total) {
-            setState(() {
-              _progress = sent / total;
-            });
-          },
-        );
+        await dio.post(address, data: formData, onSendProgress: (int sent, int total) {
+          setState(() {
+            _progress = sent / total;
+          });
+        },
+            options: Options(
+              headers: {
+                'id': clientId,
+              },
+            ));
         Future.delayed(const Duration(seconds: 1), () {
           setState(() {
             _progress = 0.0;

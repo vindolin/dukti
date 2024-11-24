@@ -17,6 +17,7 @@ part 'webserver_service.g.dart';
 class Upload {
   final String filename;
   final int contentLength;
+  final String clientId;
   int bytesReceived = 0;
   double progress = 0.0;
   bool abortFlag = false;
@@ -24,6 +25,7 @@ class Upload {
   Upload({
     required this.filename,
     required this.contentLength,
+    required this.clientId,
   });
 }
 
@@ -91,10 +93,9 @@ Future<Response> _handleClipboard(Request request, Ref ref) async {
 }
 
 Future<Response> _receiveUpload(Request request, Ref ref) async {
-  // final uploadInProgress = ref.watch(togglerProvider('uploadInProgress'));
-
   try {
     final contentType = request.headers['content-type'];
+    final clientId = request.headers['clientId'];
     if (contentType != null && contentType.startsWith('multipart/form-data')) {
       // Extract boundary from content type
       final boundary = contentType.split('boundary=')[1];
@@ -121,6 +122,7 @@ Future<Response> _receiveUpload(Request request, Ref ref) async {
 
         // Create an Upload object and add it to UploadProgressList
         final upload = Upload(
+          clientId: clientId!,
           filename: filename!,
           contentLength: contentLength,
         );
@@ -148,6 +150,7 @@ Future<Response> _receiveUpload(Request request, Ref ref) async {
           uploadProgress.remove(filename);
         } catch (e) {
           // Delete the partially downloaded file if an error occurs
+          rethrow;
           if (await file.exists()) {
             await file.delete();
             logger.i('Partial file deleted due to error: $e');
@@ -161,6 +164,7 @@ Future<Response> _receiveUpload(Request request, Ref ref) async {
       return Response(400, body: 'Invalid content type');
     }
   } catch (e) {
+    rethrow;
     logger.e('Error receiving upload: $e');
     return Response.internalServerError(body: 'Error receiving upload');
   }
