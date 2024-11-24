@@ -33,21 +33,21 @@ class _UploadWidgetState extends State<UploadWidget> {
 
       final formData = FormData.fromMap({
         'file': await MultipartFile.fromFile(filePath, filename: fileName),
+        'clientId': clientId,
       });
 
       final address = 'http://${widget.client.ip}:${widget.client.port}/upload';
 
       try {
-        await dio.post(address, data: formData, onSendProgress: (int sent, int total) {
-          setState(() {
-            _progress = sent / total;
-          });
-        },
-            options: Options(
-              headers: {
-                'id': clientId,
-              },
-            ));
+        await dio.post(
+          address,
+          data: formData,
+          onSendProgress: (int sent, int total) {
+            setState(() {
+              _progress = sent / total;
+            });
+          },
+        );
         Future.delayed(const Duration(seconds: 1), () {
           setState(() {
             _progress = 0.0;
