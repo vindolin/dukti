@@ -45,6 +45,7 @@ void stopBroadcast() async {
 Timer? _staleClientTimer;
 
 void removeStaleClients(Ref ref) {
+  return;
   _staleClientTimer ??= Timer.periodic(
     Duration(seconds: 30),
     (timer) async {
@@ -88,12 +89,11 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
   var allEvents = <bonsoir.BonsoirDiscoveryEvent>[];
 
   await for (final event in discovery.eventStream!) {
+    final [name, id, uniqueName] = parseUniqueName(event.service?.name);
     switch (event.type) {
       // found a service, resolve it
       case bonsoir.BonsoirDiscoveryEventType.discoveryServiceFound:
         logger.i('Service found : ${event.service?.name}');
-
-        final [name, id, uniqueName] = parseUniqueName(event.service?.name);
 
         // ignore self
         if (uniqueName != clientUniqueName) {
@@ -101,7 +101,7 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
             name: name,
             id: id,
           );
-          clients.set(name, client);
+          clients.set(client);
 
           // resolve this client
           Future.delayed(Duration(milliseconds: 1000), () {
@@ -116,7 +116,6 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
         logger.i('Service resolved : ${event.service?.name}');
 
         final json = event.service?.toJson();
-        final [name, id, uniqueName] = parseUniqueName(event.service?.name);
         final String? host = json?['service.host'];
 
         // ignore self
@@ -144,7 +143,7 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
             port: port,
             platform: platform,
           );
-          clients.set(name, client);
+          clients.set(client);
         } else {
           logger.e('Ignoring self');
         }
@@ -157,12 +156,8 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
       // lost a service
       case bonsoir.BonsoirDiscoveryEventType.discoveryServiceLost:
         logger.i('Service lost : ${event.service?.name}');
-
         // remove the client from the clients provider
-        final String? name = event.service?.name;
-        if (name != null) {
-          clients.remove(name);
-        }
+        clients.remove(id);
         break;
 
       default:
