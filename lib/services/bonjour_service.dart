@@ -96,7 +96,7 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
         final [name, id, uniqueName] = parseUniqueName(event.service?.name);
 
         // ignore self
-        if (name != clientUniqueName) {
+        if (uniqueName != clientUniqueName) {
           DuktiClient client = DuktiClient(
             name: name,
             id: id,
@@ -120,7 +120,7 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
         final String? host = json?['service.host'];
 
         // ignore self
-        if (host != null && name != clientUniqueName) {
+        if (host != null && uniqueName != clientUniqueName) {
           final platformString = json?['service.attributes']['platform'];
           final port = json?['service.port'];
           final ip = await lookupIP4(host);
