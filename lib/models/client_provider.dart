@@ -35,6 +35,10 @@ class DuktiClients extends _$DuktiClients {
     state = Map.from(state)..[client.id] = client;
   }
 
+  // void remove(String id) {
+  //   state = Map.from(state)..remove(id);
+  // }
+
   void remove(String name) {
     state = Map.from(state)..remove(name);
   }
