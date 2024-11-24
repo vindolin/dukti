@@ -31,16 +31,8 @@ class DuktiClients extends _$DuktiClients {
     return {};
   }
 
-  void set(String name, DuktiClient client) {
-    state = Map.from(state)
-      ..[name] = DuktiClient(
-        name: name,
-        id: client.id,
-        host: client.host,
-        ip: client.ip,
-        port: client.port,
-        platform: client.platform,
-      );
+  void set(DuktiClient client) {
+    state = Map.from(state)..[client.id] = client;
   }
 
   void remove(String name) {
