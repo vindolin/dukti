@@ -1,10 +1,11 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 
 import '/models/client_provider.dart';
 import '/widgets/upload_widget.dart';
 import '/services/clipboard_service.dart';
 
-class ClientScreen extends StatelessWidget {
+class ClientScreen extends ConsumerWidget {
   final DuktiClient client;
 
   const ClientScreen({
@@ -13,7 +14,20 @@ class ClientScreen extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final clients = ref.watch(duktiClientsProvider);
+
+    if (!clients.containsKey(client.name)) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Client ${client.name}'),
+        ),
+        body: Center(
+          child: Text('Client not found'),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Client ${client.name}'),
