@@ -23,6 +23,7 @@ class ClientScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text('Client: ${client.name}'),
+            Text('ID: ${client.id}'),
             Text('Host: ${client.host}'),
             Text('IP: ${client.ip}'),
             Text('Port: ${client.port}'),

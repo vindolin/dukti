@@ -62,6 +62,18 @@ void removeStaleClients(Ref ref) {
   );
 }
 
+/// parse the client.name like "name_68b80958" into clientName, clientId
+List<String> parseUniqueName(String? uniqueName) {
+  if (uniqueName == null) {
+    throw Exception('Invalid service name: $uniqueName');
+  }
+  final parts = uniqueName.split('_');
+  if (parts.length != 2) {
+    throw Exception('Invalid service name: $uniqueName');
+  }
+  return parts..add(uniqueName);
+}
+
 /// Stream provider that listens to bonsoir events
 @riverpod
 Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
@@ -81,12 +93,13 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
       case bonsoir.BonsoirDiscoveryEventType.discoveryServiceFound:
         logger.i('Service found : ${event.service?.name}');
 
-        final String? name = event.service?.name;
+        final [name, id, uniqueName] = parseUniqueName(event.service?.name);
 
         // ignore self
-        if (name != null && name != clientUniqueName) {
+        if (name != clientUniqueName) {
           DuktiClient client = DuktiClient(
             name: name,
+            id: id,
           );
           clients.set(name, client);
 
@@ -103,11 +116,11 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
         logger.i('Service resolved : ${event.service?.name}');
 
         final json = event.service?.toJson();
-        final String? name = event.service?.name;
+        final [name, id, uniqueName] = parseUniqueName(event.service?.name);
         final String? host = json?['service.host'];
 
         // ignore self
-        if (name != null && host != null && name != clientUniqueName) {
+        if (host != null && name != clientUniqueName) {
           final platformString = json?['service.attributes']['platform'];
           final port = json?['service.port'];
           final ip = await lookupIP4(host);
@@ -125,6 +138,7 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
 
           DuktiClient client = DuktiClient(
             name: name,
+            id: id,
             host: host,
             ip: ip,
             port: port,
