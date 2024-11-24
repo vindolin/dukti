@@ -11,20 +11,41 @@ import 'package:path_provider/path_provider.dart';
 
 import '../utils/logger.dart';
 import '/services/clipboard_service.dart';
-import '/models/generic_providers.dart';
-// import '/services/upload_service.dart';
 
 part 'webserver_service.g.dart';
 
+class Upload {
+  final String filename;
+  final int contentLength;
+  int bytesReceived = 0;
+  double progress = 0.0;
+  bool abortFlag = false;
+
+  Upload({
+    required this.filename,
+    required this.contentLength,
+  });
+}
+
+//TODO allow the same file to be uploaded only once
+
 @Riverpod(keepAlive: true)
-class ReceiveProgress extends _$ReceiveProgress {
+class UploadProgress extends _$UploadProgress {
   @override
-  double build() {
-    return 0.0;
+  Map<String, Upload> build() {
+    return {};
   }
 
-  void set(double progress) {
-    state = progress;
+  void add(String filename, Upload upload) {
+    state = Map.from(state)..[filename] = upload;
+  }
+
+  void remove(String filename) {
+    state = Map.from(state)..remove(filename);
+  }
+
+  void clear() {
+    state = {};
   }
 }
 
@@ -70,19 +91,18 @@ Future<Response> _handleClipboard(Request request, Ref ref) async {
 }
 
 Future<Response> _receiveUpload(Request request, Ref ref) async {
-  final receiveProgressNotifier = ref.read(receiveProgressProvider.notifier);
-  final uploadInProgress = ref.watch(togglerProvider('uploadInProgress'));
+  // final uploadInProgress = ref.watch(togglerProvider('uploadInProgress'));
 
-  // Check if an upload is already in progress
-  if (uploadInProgress) {
-    return Response(
-      429,
-      body: 'Another upload is currently in progress. Please wait and try again.',
-    );
-  }
+  // // Check if an upload is already in progress
+  // if (uploadInProgress) {
+  //   return Response(
+  //     429,
+  //     body: 'Another upload is currently in progress. Please wait and try again.',
+  //   );
+  // }
 
-  // Set the uploadProgress flag to true
-  ref.read(togglerProvider('uploadInProgress').notifier).set(true);
+  // // Set the uploadProgress flag to true
+  // ref.read(togglerProvider('uploadInProgress').notifier).set(true);
 
   try {
     final contentType = request.headers['content-type'];
@@ -97,6 +117,7 @@ Future<Response> _receiveUpload(Request request, Ref ref) async {
       // Get content length for progress tracking
       final contentLength = int.tryParse(request.headers['content-length'] ?? '0') ?? 0;
       int bytesReceived = 0;
+      final uploadProgress = ref.watch(uploadProgressProvider.notifier);
 
       // Process each part
       await for (final part in parts) {
@@ -108,30 +129,50 @@ Future<Response> _receiveUpload(Request request, Ref ref) async {
         // Create file to write to
         final directory = await getApplicationDocumentsDirectory();
         final file = File('${directory.path}/$filename');
-        final fileSink = file.openWrite();
 
-        // Write data chunks directly to the file
-        await for (final data in part) {
-          bytesReceived += data.length;
-          fileSink.add(data);
+        // Create an Upload object and add it to UploadProgressList
+        final upload = Upload(
+          filename: filename!,
+          contentLength: contentLength,
+        );
 
-          // Update progress
-          double progress = bytesReceived / contentLength;
-          receiveProgressNotifier.set(progress);
-          logger.i('Upload progress: $progress');
+        try {
+          final fileSink = file.openWrite();
+
+          // Write data chunks directly to the file
+          await for (final data in part) {
+            bytesReceived += data.length;
+            fileSink.add(data);
+
+            // Update progress
+            double progress = bytesReceived / contentLength;
+            upload.progress = progress;
+
+            // Update the Upload object in the list
+            uploadProgress.add(filename, upload);
+            logger.i('Upload progress for $filename: $progress');
+          }
+
+          await fileSink.close();
+          logger.i('File saved: ${file.path}');
+
+          uploadProgress.remove(filename);
+        } catch (e) {
+          // Delete the partially downloaded file if an error occurs
+          if (await file.exists()) {
+            await file.delete();
+            logger.i('Partial file deleted due to error: $e');
+          }
+          rethrow;
         }
-
-        await fileSink.close();
-        logger.i('File saved: ${file.path}');
       }
 
-      receiveProgressNotifier.set(1.0);
       return Response.ok('File uploaded');
     } else {
       return Response(400, body: 'Invalid content type');
     }
-  } finally {
-    // Set the uploadProgress flag to false
-    ref.read(togglerProvider('uploadInProgress').notifier).set(false);
+  } catch (e) {
+    logger.e('Error receiving upload: $e');
+    return Response.internalServerError(body: 'Error receiving upload');
   }
 }
