@@ -1,3 +1,4 @@
+import 'package:dukti/models/generic_providers.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import '/models/client_name.dart';
 import '/services/bonjour_service.dart';
 import '/services/clipboard_service.dart';
 import '/services/server_port_service.dart';
+import '/models/generic_providers.dart';
 import '/services/webserver_service.dart';
 import 'client_list/widgets/client_list_widget.dart';
 
@@ -71,6 +73,7 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
   Widget build(BuildContext context) {
     logger.t('Building DuktiHome');
     final clipboardStream = ref.watch(clipboardServiceProvider);
+    final useDarkTheme = ref.watch(togglerProvider('darkTheme'));
 
     // show snackbar on socket event
     if (clipboardStream.hasValue) {
@@ -85,8 +88,34 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text('$clientUniqueName:$serverPort'),
+        title: RichText(
+          text: TextSpan(
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
+            children: [
+              TextSpan(
+                text: clientName,
+              ),
+              TextSpan(
+                text: ' $clientId',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimary,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+            ],
+          ),
+        ),
         actions: [
+          Switch(
+            value: useDarkTheme,
+            onChanged: (value) {
+              ref.read(togglerProvider('darkTheme').notifier).toggle();
+            },
+          ),
           // button that restarts the discovery
           IconButton(
             onPressed: () {

@@ -23,6 +23,8 @@ class ClientList extends ConsumerWidget {
         (a, b) => a.value.name.compareTo(b.value.name),
       );
 
+    final brightness = Theme.of(context).brightness;
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Align(
@@ -43,7 +45,7 @@ class ClientList extends ConsumerWidget {
                   Container(
                     margin: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.grey[100],
+                      color: brightness == Brightness.light ? Colors.white : Colors.grey[800],
                       borderRadius: BorderRadius.circular(10),
                       boxShadow: const [
                         BoxShadow(
