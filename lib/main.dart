@@ -8,6 +8,7 @@ import '/screens/home_screen.dart';
 import '/services/bonjour_service.dart' as bonsoir;
 import '/services/server_port_service.dart';
 import '/models/client_name.dart';
+import '/models/generic_providers.dart';
 import '/models/client_provider.dart';
 import '/services/webserver_service.dart';
 import 'utils/platform_helper.dart';
@@ -62,12 +63,21 @@ class DuktiApp extends HookConsumerWidget {
     ref.watch(startWebServerProvider(serverPort!));
     ref.watch(bonsoir.eventsProvider);
 
+    final useDarkTheme = ref.watch(togglerProvider('darkTheme'));
+
     return MaterialApp(
       title: 'Dukti',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
+        // brightness: Brightness.light,
       ),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple, brightness: Brightness.dark),
+        useMaterial3: true,
+      ),
+      themeMode: useDarkTheme ? ThemeMode.dark : ThemeMode.light,
+      // themeMode: ThemeMode.light,
       home: const DuktiHome(title: 'Dukti!'),
     );
   }
