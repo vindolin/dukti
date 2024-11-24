@@ -1,7 +1,9 @@
-import 'package:dukti/models/client_provider.dart';
 import 'package:flutter/material.dart';
+
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
+
+import '/models/client_provider.dart';
 
 import '../utils/logger.dart';
 
@@ -14,11 +16,11 @@ class UploadWidget extends StatefulWidget {
 }
 
 class _UploadWidgetState extends State<UploadWidget> {
-  double _progress = 0;
+  double _progress = 0.0;
 
   Future<void> _uploadFile() async {
     setState(() {
-      _progress = 0;
+      _progress = 0.0;
     });
 
     final result = await FilePicker.platform.pickFiles();
@@ -45,6 +47,12 @@ class _UploadWidgetState extends State<UploadWidget> {
             });
           },
         );
+        Future.delayed(const Duration(seconds: 1), () {
+          setState(() {
+            _progress = 0.0;
+          });
+        });
+
         logger.i('Upload complete');
       } catch (e) {
         logger.i('Upload failed: $e');
@@ -56,7 +64,7 @@ class _UploadWidgetState extends State<UploadWidget> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        SizedBox(width: 200, child: LinearProgressIndicator(value: _progress)),
+        if (_progress != 0.0) SizedBox(width: 200, child: LinearProgressIndicator(value: _progress)),
         IconButton(
           onPressed: _uploadFile,
           icon: const Icon(Icons.upload),
