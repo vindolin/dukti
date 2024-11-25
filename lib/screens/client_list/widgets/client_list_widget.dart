@@ -7,6 +7,7 @@ import '/services/webserver_service.dart';
 import '/models/client_provider.dart';
 import '/models/generic_providers.dart';
 import '/widgets/platform_icon_widget.dart';
+import '/utils/blendmask.dart';
 import '../client_screen.dart';
 
 import '/utils/logger.dart';
@@ -140,8 +141,11 @@ class ClientListTile extends StatelessWidget {
                     ],
             ),
           ),
-          UploadList(
-            client: client,
+          Padding(
+            padding: const EdgeInsets.only(top: 4.0),
+            child: UploadList(
+              client: client,
+            ),
           )
         ],
       ),
@@ -178,12 +182,33 @@ class UploadList extends ConsumerWidget {
         final fileName = upload.filename;
         final progress = upload.progress;
 
-        return Row(
-          children: [
-            Text(fileName),
-            const Spacer(),
-            Text('${(progress * 100).toStringAsFixed(0)}%'),
-          ],
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 4.0),
+          child: Stack(
+            children: [
+              SizedBox(
+                height: 24,
+                child: LinearProgressIndicator(
+                  borderRadius: BorderRadius.circular(4),
+                  value: progress / 2,
+                ),
+              ),
+              Align(
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 4.0),
+                  child: BlendMask(
+                    blendMode: BlendMode.exclusion,
+                    child: Text(
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                      fileName,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         );
       }).toList(),
     );
