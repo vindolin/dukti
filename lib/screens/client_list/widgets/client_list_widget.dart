@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:animated_list_plus/animated_list_plus.dart';
 
+import '/services/webserver_service.dart';
 import '/models/client_provider.dart';
 import '/models/generic_providers.dart';
 import '/widgets/platform_icon_widget.dart';
@@ -139,9 +140,9 @@ class ClientListTile extends StatelessWidget {
                     ],
             ),
           ),
-          // UploadList(
-          //   client: client,
-          // )
+          UploadList(
+            client: client,
+          )
         ],
       ),
       onTap: client.ip != null
@@ -158,24 +159,33 @@ class ClientListTile extends StatelessWidget {
   }
 }
 
-// class UploadList extends ConsumerWidget {
-//   final DuktiClient client;
-//   const UploadList({super.key, required this.client});
+class UploadList extends ConsumerWidget {
+  final DuktiClient client;
+  const UploadList({super.key, required this.client});
 
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     final uploadProgress = ref.watch(uploadProgressProvider);
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // final uploadProgress = ref.watch(uploadProgressProvider.select((state) => state[client.id]));
+    final uploadProgress = ref.watch(uploadProgressProvider);
+    final uploads = uploadProgress[client.id];
+    if (uploads == null) {
+      return const Text('---');
+    }
+    logger.e(uploads);
 
-//     // filter out the upload progress for this client
-//     final clientUploadProgress = uploadProgress.entries
-//         .where(
-//           (upload) => upload.value.clientId == client.id,
-//         )
-//         .map((e) => e.value)
-//         .toList();
+    return Column(
+      children: uploads.values.map((upload) {
+        final fileName = upload.filename;
+        final progress = upload.progress;
 
-//     print(clientUploadProgress);
-
-//     return const Text('xxx');
-//   }
-// }
+        return Row(
+          children: [
+            Text(fileName),
+            const Spacer(),
+            Text('${(progress * 100).toStringAsFixed(0)}%'),
+          ],
+        );
+      }).toList(),
+    );
+  }
+}

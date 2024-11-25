@@ -151,36 +151,36 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
       //   tooltip: 'Stop broadcasting',
       //   child: const Icon(Icons.close),
       // ),
-      bottomNavigationBar: SizedBox(
-        width: double.infinity,
-        height: 20,
-        child: ReceiveProgressWidget(),
-      ),
+      // bottomNavigationBar: SizedBox(
+      //   width: double.infinity,
+      //   height: 20,
+      //   child: ReceiveProgressWidget(),
+      // ),
     );
   }
 }
 
-class ReceiveProgressWidget extends ConsumerWidget {
-  const ReceiveProgressWidget({super.key});
+// class ReceiveProgressWidget extends ConsumerWidget {
+//   const ReceiveProgressWidget({super.key});
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // TODO implement upload list
-    double progress = 0.0;
-    final receiveProgress = ref.watch(uploadProgressProvider);
-    if (receiveProgress.isNotEmpty) {
-      progress = receiveProgress.values.first.progress;
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     // TODO implement upload list
+//     double progress = 0.0;
+//     final receiveProgress = ref.watch(uploadProgressProvider);
+//     if (receiveProgress.isNotEmpty) {
+//       progress = receiveProgress.values.first.progress;
 
-      // if receiveProgress is 100%, start a timer and clear the progress after 1 second
-      if (progress == 1.0) {
-        progress = 0.0;
-      }
-    }
+//       // if receiveProgress is 100%, start a timer and clear the progress after 1 second
+//       if (progress == 1.0) {
+//         progress = 0.0;
+//       }
+//     }
 
-    return LinearProgressIndicator(
-      value: progress,
-      backgroundColor: Colors.grey[300],
-      valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
-    );
-  }
-}
+//     return LinearProgressIndicator(
+//       value: progress,
+//       backgroundColor: Colors.grey[300],
+//       valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
+//     );
+//   }
+// }

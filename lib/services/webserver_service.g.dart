@@ -157,12 +157,12 @@ class _StartWebServerProviderElement
   int get port => (origin as StartWebServerProvider).port;
 }
 
-String _$uploadProgressHash() => r'c48342e9e827dff97f03c2e20123e669588b0e6e';
+String _$uploadProgressHash() => r'99e274d795842050778dafe2f6e6f9215ced6ccf';
 
 /// See also [UploadProgress].
 @ProviderFor(UploadProgress)
 final uploadProgressProvider =
-    NotifierProvider<UploadProgress, Map<String, Upload>>.internal(
+    NotifierProvider<UploadProgress, Map<String, Map<int, Upload>?>>.internal(
   UploadProgress.new,
   name: r'uploadProgressProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -172,6 +172,6 @@ final uploadProgressProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$UploadProgress = Notifier<Map<String, Upload>>;
+typedef _$UploadProgress = Notifier<Map<String, Map<int, Upload>?>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
