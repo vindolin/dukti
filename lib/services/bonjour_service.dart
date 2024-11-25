@@ -44,11 +44,13 @@ void stopBroadcast() async {
 
 Timer? _staleClientTimer;
 
+/// Remove clients that are no longer reacting to pings
 void removeStaleClients(Ref ref) {
   _staleClientTimer ??= Timer.periodic(
     Duration(seconds: 30),
     (timer) async {
       final clients = ref.read(duktiClientsProvider);
+      // logger.i('Checking for stale clients');
 
       for (var client in clients.values) {
         if (client.ip != null && client.port != null) {
@@ -63,7 +65,7 @@ void removeStaleClients(Ref ref) {
   );
 }
 
-/// parse the client.name like "name_68b80958" into clientName, clientId
+/// parse the client.name like "name_68b80958" into clientName, clientId, uniqueName
 List<String> parseUniqueName(String? uniqueName) {
   if (uniqueName == null) {
     throw Exception('Invalid service name: $uniqueName');
@@ -103,8 +105,8 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
         // ignore self
         if (uniqueName != clientUniqueName) {
           DuktiClient client = DuktiClient(
-            name: name,
             id: id,
+            name: name,
           );
           clients.set(client);
 
@@ -141,8 +143,8 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
           );
 
           DuktiClient client = DuktiClient(
-            name: name,
             id: id,
+            name: name,
             host: host,
             ip: ip,
             port: port,
@@ -153,7 +155,7 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
           logger.e('Ignoring self');
         }
 
-        // we don't use those directly, use the clients map instead
+        // we don't use those directly, use the clients map directly
         allEvents = [...allEvents, event];
         yield allEvents;
         break;

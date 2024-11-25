@@ -15,6 +15,7 @@ import '/services/clipboard_service.dart';
 part 'webserver_service.g.dart';
 
 class Upload {
+  final int fileId;
   final String filename;
   final int contentLength;
   final String clientId;
@@ -23,6 +24,7 @@ class Upload {
   bool abortFlag = false;
 
   Upload({
+    required this.fileId,
     required this.filename,
     required this.contentLength,
     required this.clientId,
@@ -30,21 +32,22 @@ class Upload {
 }
 
 //TODO allow the same file to be uploaded only once
-
 @Riverpod(keepAlive: true)
 class UploadProgress extends _$UploadProgress {
   @override
-  Map<String, Upload> build() {
+  Map<String, Map<int, Upload>?> build() {
     return {};
   }
 
-  void add(String filename, Upload upload) {
-    state = Map.from(state)..[filename] = upload;
+  void add(String clientId, Upload upload) {
+    state.putIfAbsent(clientId, () => {});
+    state[clientId]![upload.fileId] = upload;
+    state = Map.from(state);
   }
 
-  void remove(String filename) {
-    state = Map.from(state)..remove(filename);
-  }
+  // void remove(String filename) {
+  //   state = Map.from(state)..remove(filename);
+  // }
 
   void clear() {
     state = {};
@@ -92,6 +95,8 @@ Future<Response> _handleClipboard(Request request, Ref ref) async {
   return Response.notFound('Not Found');
 }
 
+int fileId = 0;
+
 Future<Response> _receiveUpload(Request request, Ref ref) async {
   try {
     final contentType = request.headers['content-type'];
@@ -118,7 +123,12 @@ Future<Response> _receiveUpload(Request request, Ref ref) async {
         final nameMatch = RegExp(r'name="([^"]*)"').firstMatch(contentDisposition);
         final fieldName = nameMatch?.group(1);
 
-        if (fieldName == 'file') {
+        if (fieldName == 'clientId') {
+          // This part is the clientId
+          final content = await utf8.decoder.bind(part).join();
+          clientId = content.trim();
+          logger.e('Received clientId: $clientId');
+        } else if (fieldName == 'file') {
           // This part is the file
           final filenameMatch = RegExp(r'filename="([^"]*)"').firstMatch(contentDisposition);
           final filename = filenameMatch != null ? filenameMatch.group(1) : 'uploaded_file';
@@ -130,10 +140,13 @@ Future<Response> _receiveUpload(Request request, Ref ref) async {
 
           // Create an Upload object and add it to UploadProgressList
           final upload = Upload(
+            fileId: fileId++,
             clientId: clientId!,
             filename: filename!,
             contentLength: contentLength,
           );
+
+          //
 
           try {
             // Write data chunks directly to the file
@@ -146,12 +159,12 @@ Future<Response> _receiveUpload(Request request, Ref ref) async {
               upload.progress = progress;
 
               // Update the Upload object in the list
-              uploadProgress.add(filename, upload);
+              uploadProgress.add(clientId, upload);
               logger.i('Upload progress for $filename: $progress');
             }
 
             upload.progress = 1.0;
-            uploadProgress.add(filename, upload);
+            uploadProgress.add(clientId, upload);
 
             await fileSink.close();
             logger.i('File saved: ${file.path}');
@@ -163,13 +176,6 @@ Future<Response> _receiveUpload(Request request, Ref ref) async {
             }
             rethrow;
           }
-        } else if (fieldName == 'clientId') {
-          // This part is the clientId
-          final content = await utf8.decoder.bind(part).join();
-          clientId = content.trim();
-          logger.e('Received clientId: $clientId');
-        } else {
-          // Handle other form fields if necessary
         }
       }
 
