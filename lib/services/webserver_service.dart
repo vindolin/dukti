@@ -49,8 +49,8 @@ class UploadProgress extends _$UploadProgress {
   //   state = Map.from(state)..remove(filename);
   // }
 
-  void clear() {
-    state = {};
+  void clear(clientId) {
+    state = Map.from(state)..remove(clientId);
   }
 }
 
