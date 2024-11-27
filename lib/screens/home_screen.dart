@@ -8,7 +8,6 @@ import '/styles/decorations.dart';
 import '/models/client_name.dart';
 import '/services/bonjour_service.dart';
 import '/services/clipboard_service.dart';
-import '/services/webserver_service.dart';
 import 'client_list/widgets/client_list_widget.dart';
 
 import '../utils/logger.dart';
@@ -96,7 +95,7 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
             ),
             children: [
               TextSpan(
-                text: clientName,
+                text: '🤖 $clientName',
               ),
               TextSpan(
                 text: ' $clientId',
@@ -144,43 +143,6 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
         decoration: fancyBackground(useDarkTheme),
         child: ClientList(),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () async {
-      //     stopBroadcast();
-      //   },
-      //   tooltip: 'Stop broadcasting',
-      //   child: const Icon(Icons.close),
-      // ),
-      // bottomNavigationBar: SizedBox(
-      //   width: double.infinity,
-      //   height: 20,
-      //   child: ReceiveProgressWidget(),
-      // ),
     );
   }
 }
-
-// class ReceiveProgressWidget extends ConsumerWidget {
-//   const ReceiveProgressWidget({super.key});
-
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     // TODO implement upload list
-//     double progress = 0.0;
-//     final receiveProgress = ref.watch(uploadProgressProvider);
-//     if (receiveProgress.isNotEmpty) {
-//       progress = receiveProgress.values.first.progress;
-
-//       // if receiveProgress is 100%, start a timer and clear the progress after 1 second
-//       if (progress == 1.0) {
-//         progress = 0.0;
-//       }
-//     }
-
-//     return LinearProgressIndicator(
-//       value: progress,
-//       backgroundColor: Colors.grey[300],
-//       valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
-//     );
-//   }
-// }
