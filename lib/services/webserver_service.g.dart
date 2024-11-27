@@ -157,7 +157,7 @@ class _StartWebServerProviderElement
   int get port => (origin as StartWebServerProvider).port;
 }
 
-String _$uploadProgressHash() => r'99e274d795842050778dafe2f6e6f9215ced6ccf';
+String _$uploadProgressHash() => r'0713bee56d6e384af9c574a615b6a679eb66ccd2';
 
 /// See also [UploadProgress].
 @ProviderFor(UploadProgress)

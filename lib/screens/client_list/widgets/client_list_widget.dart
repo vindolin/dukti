@@ -7,7 +7,6 @@ import '/services/webserver_service.dart';
 import '/models/client_provider.dart';
 import '/models/generic_providers.dart';
 import '/widgets/platform_icon_widget.dart';
-import '/utils/blendmask.dart';
 import '../client_screen.dart';
 
 import '/utils/logger.dart';
@@ -173,44 +172,51 @@ class UploadList extends ConsumerWidget {
     final uploadProgress = ref.watch(uploadProgressProvider);
     final uploads = uploadProgress[client.id];
     if (uploads == null) {
-      return const Text('---');
+      return SizedBox.shrink();
     }
     logger.e(uploads);
 
-    return Column(
-      children: uploads.values.map((upload) {
-        final fileName = upload.filename;
-        final progress = upload.progress;
-
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 4.0),
-          child: Stack(
-            children: [
-              SizedBox(
-                height: 24,
-                child: LinearProgressIndicator(
-                  borderRadius: BorderRadius.circular(4),
-                  value: progress / 2,
-                ),
-              ),
-              Align(
-                alignment: Alignment.topLeft,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 4.0),
-                  child: BlendMask(
-                    blendMode: BlendMode.exclusion,
-                    child: Text(
-                      style: TextStyle(color: Colors.white, fontSize: 12),
-                      fileName,
-                      overflow: TextOverflow.ellipsis,
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            children: uploads.values.map((upload) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 4.0),
+                child: Stack(
+                  children: [
+                    SizedBox(
+                      height: 24,
+                      child: LinearProgressIndicator(
+                        borderRadius: BorderRadius.circular(4),
+                        value: upload.progress,
+                        color: Colors.green,
+                      ),
                     ),
-                  ),
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 4.0),
+                        child: Text(
+                          style: TextStyle(color: Colors.black, fontSize: 12),
+                          upload.filename,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
+              );
+            }).toList(),
           ),
-        );
-      }).toList(),
+        ),
+        IconButton(
+          onPressed: () async {
+            ref.read(uploadProgressProvider.notifier).clear(client.id);
+          },
+          icon: const Icon(Icons.clear),
+        ),
+      ],
     );
   }
 }

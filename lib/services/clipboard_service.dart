@@ -32,9 +32,8 @@ sendClipboard(DuktiClient client) async {
   final clipboardData = await Clipboard.getData('text/plain');
   // logger.e('Clipboard data: ${clipboardData?.text}');
   if (clipboardData != null && clipboardData.text != null) {
-    final dio = Dio();
     try {
-      final response = await dio.post(
+      final response = await Dio().post(
         'http://${client.host}:${client.port}/clipboard',
         data: {'text': clipboardData.text},
       );
