@@ -1,5 +1,6 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:markup_text/markup_text.dart';
 
 import '/models/generic_providers.dart';
 import '/styles/decorations.dart';
@@ -32,55 +33,116 @@ class ClientScreen extends ConsumerWidget {
       );
     }
 
+    final hostInfoStyle = TextStyle(fontSize: 24);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(client.name),
       ),
       body: Container(
         decoration: fancyBackground(useDarkTheme),
-        // decoration: BoxDecoration(
-        //   borderRadius: BorderRadius.circular(10),
-        //   boxShadow: const [
-        //     BoxShadow(
-        //       color: Colors.black12,
-        //       blurRadius: 1.0,
-        //       spreadRadius: 1.0,
-        //       offset: Offset(5.0, 5.0),
-        //     ),
-        //   ],
-        // ),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              PlatformIcon(platform: client.platform!),
-              Text(client.name),
-              Text('ID: ${client.id}'),
-              Text(
-                'Host: ${client.host}',
-                overflow: TextOverflow.ellipsis,
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      PlatformIcon(platform: client.platform!),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          client.name,
+                          style: TextStyle(
+                            overflow: TextOverflow.ellipsis,
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  MarkupText(
+                    '(b)ID(/b): ${client.id}',
+                    style: hostInfoStyle,
+                  ),
+                  MarkupText(
+                    '(b)Host(/b): ${client.host}',
+                    style: hostInfoStyle,
+                  ),
+                  MarkupText(
+                    '(b)IP(/b): ${client.ip}\n'
+                    '(b)Port(/b): ${client.port}',
+                    style: hostInfoStyle.copyWith(
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  // Text(client.name),
+                  // Text('ID: ${client.id}'),
+                  // Text(
+                  //   'Host: ${client.host}',
+                  //   overflow: TextOverflow.ellipsis,
+                  // ),
+                  // Text('IP: ${client.ip}'),
+                  // Text('Port: ${client.port}'),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16.0),
+                    child: OutlinedButton(
+                      onPressed: () async {
+                        await sendClipboard(client);
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.paste),
+                          SizedBox(width: 8),
+                          const Text('Send clipboard text'),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16.0),
+                    child: OutlinedButton(
+                      onPressed: () async {
+                        await sendClipboard(client);
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.paste),
+                          SizedBox(width: 8),
+                          UploadWidget(client: client),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              Text('IP: ${client.ip}'),
-              Text('Port: ${client.port}'),
             ],
           ),
         ),
       ),
-      bottomNavigationBar: BottomAppBar(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            UploadWidget(client: client),
-            IconButton(
-              onPressed: () async {
-                await sendClipboard(client);
-              },
-              icon: const Icon(Icons.paste),
-            ),
-          ],
-        ),
-      ),
+      // bottomNavigationBar: BottomAppBar(
+      //   child: Row(
+      //     mainAxisAlignment: MainAxisAlignment.end,
+      //     children: [
+      //       UploadWidget(client: client),
+      //       IconButton(
+      //         onPressed: () async {
+      //           await sendClipboard(client);
+      //         },
+      //         icon: const Icon(Icons.paste),
+      //       ),
+      //     ],
+      //   ),
+      // ),
     );
   }
 }

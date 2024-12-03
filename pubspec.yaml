@@ -29,6 +29,7 @@ dependencies:
   animated_list_plus: ^0.5.2
   hooks_riverpod: ^2.6.1
   flutter_hooks: ^0.20.5
+  markup_text: ^1.0.4
 
 dev_dependencies:
   flutter_test:
