@@ -1,27 +1,34 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 
 import 'package:dio/dio.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:file_picker/file_picker.dart';
 
 import '/models/client_name.dart';
 import '/models/client_provider.dart';
 import '/utils/logger.dart';
 
-class UploadWidget extends StatefulWidget {
+part 'upload_widget.g.dart';
+
+@riverpod
+class UploadProgress extends _$UploadProgress {
+  @override
+  double build() {
+    return 0.0;
+  }
+
+  void set(double value) {
+    state = value;
+  }
+}
+
+class UploadWidget extends ConsumerWidget {
   final DuktiClient client;
   const UploadWidget({super.key, required this.client});
 
-  @override
-  State<StatefulWidget> createState() => _UploadWidgetState();
-}
-
-class _UploadWidgetState extends State<UploadWidget> {
-  double _progress = 0.0;
-
-  Future<void> _uploadFile() async {
-    setState(() {
-      _progress = 0.0;
-    });
+  Future<void> _uploadFile(WidgetRef ref) async {
+    final uploadProgressNotifier = ref.read(uploadProgressProvider.notifier);
 
     final result = await FilePicker.platform.pickFiles();
 
@@ -36,22 +43,18 @@ class _UploadWidgetState extends State<UploadWidget> {
         'clientId': clientId,
       });
 
-      final address = 'http://${widget.client.ip}:${widget.client.port}/upload';
+      final address = 'http://${client.ip}:${client.port}/upload';
 
       try {
         await dio.post(
           address,
           data: formData,
           onSendProgress: (int sent, int total) {
-            setState(() {
-              _progress = sent / total;
-            });
+            uploadProgressNotifier.set(sent / total);
           },
         );
         Future.delayed(const Duration(seconds: 1), () {
-          setState(() {
-            _progress = 0.0;
-          });
+          uploadProgressNotifier.set(0.0);
         });
 
         logger.i('Upload complete');
@@ -62,12 +65,13 @@ class _UploadWidgetState extends State<UploadWidget> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final uploadProgress = ref.watch(uploadProgressProvider);
     return Row(
       children: [
-        if (_progress != 0.0) SizedBox(width: 200, child: LinearProgressIndicator(value: _progress)),
+        if (uploadProgress != 0.0) SizedBox(width: 200, child: LinearProgressIndicator(value: uploadProgress)),
         IconButton(
-          onPressed: _uploadFile,
+          onPressed: () => _uploadFile(ref),
           icon: const Icon(Icons.upload),
         )
       ],
