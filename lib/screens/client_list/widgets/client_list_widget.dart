@@ -5,7 +5,6 @@ import 'package:animated_list_plus/animated_list_plus.dart';
 
 import '/services/webserver_service.dart';
 import '/models/client_provider.dart';
-import '/models/generic_providers.dart';
 import '/widgets/platform_icon_widget.dart';
 import '../client_screen.dart';
 
@@ -21,7 +20,6 @@ class ClientList extends ConsumerWidget {
     logger.t('Building ClientList');
 
     final clients = ref.watch(duktiClientsProvider);
-    final useDarkTheme = ref.watch(togglerProvider('darkTheme'));
 
     final clientsList = clients.entries.toList()
       ..sort(
@@ -40,7 +38,7 @@ class ClientList extends ConsumerWidget {
           areItemsTheSame: (a, b) => a.key == b.key,
           itemBuilder: (context, animation, entry, index) {
             final client = entry.value;
-            final textColor = useDarkTheme ? Colors.white70 : Colors.black;
+            final textColor = Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black;
 
             return SizeFadeTransition(
               sizeFraction: 0.7,
@@ -90,8 +88,8 @@ class ClientListTile extends StatelessWidget {
       leading: client.platform != null
           ? PlatformIcon(platform: client.platform!)
           : SizedBox(width: 24, height: 24, child: CircularProgressIndicator()),
-      title: RichText(
-        text: TextSpan(
+      title: Text.rich(
+        TextSpan(
           children: [
             TextSpan(
               style: TextStyle(
@@ -114,9 +112,9 @@ class ClientListTile extends StatelessWidget {
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          RichText(
+          Text.rich(
             overflow: TextOverflow.ellipsis,
-            text: TextSpan(
+            TextSpan(
               children: client.ip != null
                   ? [
                       TextSpan(
@@ -168,7 +166,6 @@ class UploadList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // final uploadProgress = ref.watch(uploadProgressProvider.select((state) => state[client.id]));
     final uploadProgress = ref.watch(uploadProgressProvider);
     final uploads = uploadProgress[client.id];
     if (uploads == null) {
