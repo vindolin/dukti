@@ -22,5 +22,20 @@ final uploadProgressProvider =
 );
 
 typedef _$UploadProgress = AutoDisposeNotifier<double>;
+String _$uploadSpeedHash() => r'd326c15e84368208be0e6100ebd0d60f0a103fd8';
+
+/// See also [UploadSpeed].
+@ProviderFor(UploadSpeed)
+final uploadSpeedProvider =
+    AutoDisposeNotifierProvider<UploadSpeed, int>.internal(
+  UploadSpeed.new,
+  name: r'uploadSpeedProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$uploadSpeedHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$UploadSpeed = AutoDisposeNotifier<int>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
