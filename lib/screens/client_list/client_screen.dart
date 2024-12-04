@@ -35,58 +35,72 @@ class ClientScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(client.name),
       ),
       body: Container(
         decoration: fancyBackground(Theme.of(context).brightness == Brightness.dark),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      PlatformIcon(platform: client.platform!),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          client.name,
-                          style: TextStyle(
+        child: Padding(
+          padding: const EdgeInsets.all(32.0),
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      // mainAxisSize: MainAxisSize.min,
+                      children: [
+                        PlatformIcon(platform: client.platform!),
+                        SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            client.name,
                             overflow: TextOverflow.ellipsis,
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  MarkupText(
-                    '(b)ID(/b): ${client.id}',
-                    style: hostInfoStyle,
-                  ),
-                  MarkupText(
-                    '(b)Host(/b): ${client.host}',
-                    style: hostInfoStyle,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: MarkupText(
-                      '(b)IP(/b): ${client.ip}\n'
-                      '(b)Port(/b): ${client.port}',
-                      style: hostInfoStyle.copyWith(
-                        overflow: TextOverflow.ellipsis,
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                    MarkupText(
+                      '(b)ID(/b): ${client.id}',
+                      style: hostInfoStyle,
+                    ),
+                    Text.rich(
+                      overflow: TextOverflow.ellipsis, // can't do this with MarkupText
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'Host: ',
+                            style: hostInfoStyle.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          TextSpan(
+                            text: client.host,
+                            style: hostInfoStyle,
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    width: 250,
-                    child: Column(
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: MarkupText(
+                        '(b)IP(/b): ${client.ip}\n'
+                        '(b)Port(/b): ${client.port}',
+                        style: hostInfoStyle.copyWith(
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                    Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Padding(
@@ -111,10 +125,10 @@ class ClientScreen extends ConsumerWidget {
                         ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -110,14 +110,20 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
         actions: [
           Icon(isBroadcasting ? Icons.wifi : Icons.wifi_off),
           SizedBox(width: 4),
-          Switch(
-            value: isBroadcasting,
-            onChanged: (value) {
-              setState(() {
-                isBroadcasting = value;
-                isBroadcasting ? startBroadcast() : stopBroadcast();
-              });
-            },
+          SizedBox(
+            width: 64,
+            height: 32,
+            child: FittedBox(
+              child: Switch(
+                value: isBroadcasting,
+                onChanged: (value) {
+                  setState(() {
+                    isBroadcasting = value;
+                    isBroadcasting ? startBroadcast() : stopBroadcast();
+                  });
+                },
+              ),
+            ),
           ),
         ],
       ),

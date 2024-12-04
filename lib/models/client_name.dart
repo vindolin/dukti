@@ -1,5 +1,5 @@
 import 'package:nanoid/nanoid.dart' as nanoid;
-import '../utils/platform_helper.dart';
+import '/utils/platform_helper.dart';
 
 String clientUniqueName = '';
 String clientName = '';
