@@ -71,7 +71,7 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
   Widget build(BuildContext context) {
     logger.t('Building DuktiHome');
     final clipboardStream = ref.watch(clipboardServiceProvider);
-    final useDarkTheme = ref.watch(togglerProvider('darkTheme'));
+    final useDarkTheme = ref.watch(togglerTrueProvider('darkTheme'));
 
     // show snackbar on socket event
     if (clipboardStream.hasValue) {
@@ -86,8 +86,8 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: RichText(
-          text: TextSpan(
+        title: Text.rich(
+          TextSpan(
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurface,
               fontWeight: FontWeight.bold,
@@ -95,7 +95,7 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
             ),
             children: [
               TextSpan(
-                text: '🤖 $clientName',
+                text: '🖥️ $clientName',
               ),
               TextSpan(
                 text: ' $clientId',
@@ -111,7 +111,7 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
           Switch(
             value: useDarkTheme,
             onChanged: (value) {
-              ref.read(togglerProvider('darkTheme').notifier).toggle();
+              ref.read(togglerTrueProvider('darkTheme').notifier).set(value);
             },
           ),
           // button that restarts the discovery

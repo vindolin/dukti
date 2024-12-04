@@ -62,8 +62,7 @@ class DuktiApp extends HookConsumerWidget {
     ref.watch(clipboardServiceProvider);
     ref.watch(startWebServerProvider(serverPort!));
     ref.watch(bonsoir.eventsProvider);
-
-    final useDarkTheme = ref.watch(togglerProvider('darkTheme'));
+    final useDarkTheme = ref.watch(togglerTrueProvider('darkTheme'));
 
     return MaterialApp(
       title: 'Dukti',
