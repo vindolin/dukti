@@ -20,7 +20,6 @@ class ClientScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final clients = ref.watch(duktiClientsProvider);
-    final useDarkTheme = ref.watch(togglerProvider('darkTheme'));
 
     if (!clients.containsKey(client.id)) {
       return Scaffold(
@@ -40,7 +39,7 @@ class ClientScreen extends ConsumerWidget {
         title: Text(client.name),
       ),
       body: Container(
-        decoration: fancyBackground(useDarkTheme),
+        decoration: fancyBackground(Theme.of(context).brightness == Brightness.dark),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -76,51 +75,42 @@ class ClientScreen extends ConsumerWidget {
                     '(b)Host(/b): ${client.host}',
                     style: hostInfoStyle,
                   ),
-                  MarkupText(
-                    '(b)IP(/b): ${client.ip}\n'
-                    '(b)Port(/b): ${client.port}',
-                    style: hostInfoStyle.copyWith(
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  // Text(client.name),
-                  // Text('ID: ${client.id}'),
-                  // Text(
-                  //   'Host: ${client.host}',
-                  //   overflow: TextOverflow.ellipsis,
-                  // ),
-                  // Text('IP: ${client.ip}'),
-                  // Text('Port: ${client.port}'),
                   Padding(
-                    padding: const EdgeInsets.only(top: 16.0),
-                    child: OutlinedButton(
-                      onPressed: () async {
-                        await sendClipboard(client);
-                      },
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.paste),
-                          SizedBox(width: 8),
-                          const Text('Send clipboard text'),
-                        ],
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: MarkupText(
+                      '(b)IP(/b): ${client.ip}\n'
+                      '(b)Port(/b): ${client.port}',
+                      style: hostInfoStyle.copyWith(
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16.0),
-                    child: OutlinedButton(
-                      onPressed: () async {
-                        await sendClipboard(client);
-                      },
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.paste),
-                          SizedBox(width: 8),
-                          UploadWidget(client: client),
-                        ],
-                      ),
+                  SizedBox(
+                    width: 250,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16.0),
+                          child: FilledButton(
+                            onPressed: () async {
+                              await sendClipboard(client);
+                            },
+                            child: Row(
+                              // mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.paste),
+                                SizedBox(width: 8),
+                                const Text('Send clipboard text'),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16.0),
+                          child: UploadButton(client: client),
+                        ),
+                      ],
                     ),
                   ),
                 ],
