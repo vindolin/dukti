@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 
@@ -23,12 +25,33 @@ class UploadProgress extends _$UploadProgress {
   }
 }
 
-class UploadWidget extends ConsumerWidget {
+@riverpod
+class UploadSpeed extends _$UploadSpeed {
+  @override
+  int build() {
+    return 0;
+  }
+
+  void set(int value) {
+    state = value;
+  }
+}
+
+String formatBytes(int bytes) {
+  if (bytes <= 0) return '0 B/s';
+  const suffixes = ['B/s', 'KB/s', 'MB/s', 'GB/s', 'TB/s'];
+  int i = (log(bytes) / log(1024)).floor();
+  double size = bytes / pow(1024, i);
+  return '${size.toStringAsFixed(2)} ${suffixes[i]}';
+}
+
+class UploadButton extends ConsumerWidget {
   final DuktiClient client;
-  const UploadWidget({super.key, required this.client});
+  const UploadButton({super.key, required this.client});
 
   Future<void> _uploadFile(WidgetRef ref) async {
     final uploadProgressNotifier = ref.read(uploadProgressProvider.notifier);
+    final uploadSpeedNotifier = ref.read(uploadSpeedProvider.notifier);
 
     final result = await FilePicker.platform.pickFiles();
 
@@ -45,16 +68,25 @@ class UploadWidget extends ConsumerWidget {
 
       final address = 'http://${client.ip}:${client.port}/upload';
 
+      final startTime = DateTime.now();
+
       try {
         await dio.post(
           address,
           data: formData,
           onSendProgress: (int sent, int total) {
+            final currentTime = DateTime.now();
+            final elapsedTime = currentTime.difference(startTime).inSeconds;
+            if (elapsedTime > 0) {
+              final speed = sent / elapsedTime; // bytes per second
+              uploadSpeedNotifier.set(speed.toInt());
+            }
             uploadProgressNotifier.set(sent / total);
           },
         );
         Future.delayed(const Duration(seconds: 1), () {
           uploadProgressNotifier.set(0.0);
+          uploadSpeedNotifier.set(0);
         });
 
         logger.i('Upload complete');
@@ -67,14 +99,52 @@ class UploadWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final uploadProgress = ref.watch(uploadProgressProvider);
-    return Row(
-      children: [
-        if (uploadProgress != 0.0) SizedBox(width: 200, child: LinearProgressIndicator(value: uploadProgress)),
-        IconButton(
-          onPressed: () => _uploadFile(ref),
-          icon: const Icon(Icons.upload),
-        )
-      ],
-    );
+    final uploadSpeed = ref.watch(uploadSpeedProvider);
+
+    return uploadProgress == 0.0
+        ? FilledButton(
+            onPressed: () => _uploadFile(ref),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Icon(Icons.upload),
+                SizedBox(width: 8),
+                const Text('Send a file'),
+              ],
+            ),
+          )
+        : SizedBox(
+            width: 250,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                LinearProgressIndicator(
+                  value: uploadProgress,
+                  minHeight: 32,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '${(uploadProgress * 100).toStringAsFixed(0)}%',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      'Speed: ${formatBytes(uploadSpeed)}',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimary,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
   }
 }
