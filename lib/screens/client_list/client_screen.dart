@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:markup_text/markup_text.dart';
 
-import '/models/generic_providers.dart';
 import '/styles/decorations.dart';
 import '/widgets/platform_icon_widget.dart';
 import '/models/client_provider.dart';
