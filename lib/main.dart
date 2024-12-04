@@ -8,7 +8,6 @@ import '/screens/home_screen.dart';
 import '/services/bonjour_service.dart' as bonsoir;
 import '/services/server_port_service.dart';
 import '/models/client_name.dart';
-import '/models/generic_providers.dart';
 import '/models/client_provider.dart';
 import '/services/webserver_service.dart';
 import 'utils/platform_helper.dart';
@@ -58,26 +57,35 @@ class DuktiApp extends HookConsumerWidget {
       return null;
     }, [appLifecycleState]);
 
-    // eagerly start the clipboard service, webserver and bonsoir discovery
-    ref.watch(clipboardServiceProvider);
-    ref.watch(startWebServerProvider(serverPort!));
-    ref.watch(bonsoir.eventsProvider);
-    final useDarkTheme = ref.watch(togglerTrueProvider('darkTheme'));
+    // final useDarkTheme = ref.watch(togglerTrueProvider('darkTheme')); // always use the system theme
 
-    return MaterialApp(
+    return _EagerInitialization(
+        child: MaterialApp(
       title: 'Dukti',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-        // brightness: Brightness.light,
+        // useMaterial3: true,
       ),
       darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple, brightness: Brightness.dark),
-        useMaterial3: true,
+        // useMaterial3: true,
       ),
-      themeMode: useDarkTheme ? ThemeMode.dark : ThemeMode.light,
-      // themeMode: ThemeMode.light,
+      // themeMode: useDarkTheme ? ThemeMode.dark : ThemeMode.light,
       home: const DuktiHome(title: 'Dukti!'),
-    );
+    ));
+  }
+}
+
+class _EagerInitialization extends ConsumerWidget {
+  const _EagerInitialization({required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(clipboardServiceProvider);
+    ref.watch(startWebServerProvider(serverPort!));
+    ref.watch(bonsoir.eventsProvider);
+    return child;
   }
 }

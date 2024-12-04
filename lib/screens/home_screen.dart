@@ -1,9 +1,9 @@
-import 'package:dukti/models/generic_providers.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import '/models/client_provider.dart';
 import '/styles/decorations.dart';
 import '/models/client_name.dart';
 import '/services/bonjour_service.dart';
@@ -71,7 +71,7 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
   Widget build(BuildContext context) {
     logger.t('Building DuktiHome');
     final clipboardStream = ref.watch(clipboardServiceProvider);
-    final useDarkTheme = ref.watch(togglerTrueProvider('darkTheme'));
+    // final useDarkTheme = ref.watch(togglerTrueProvider('darkTheme'));
 
     // show snackbar on socket event
     if (clipboardStream.hasValue) {
@@ -95,7 +95,7 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
             ),
             children: [
               TextSpan(
-                text: '🖥️ $clientName',
+                text: clientName, //🖥️
               ),
               TextSpan(
                 text: ' $clientId',
@@ -108,26 +108,8 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
           ),
         ),
         actions: [
-          Switch(
-            value: useDarkTheme,
-            onChanged: (value) {
-              ref.read(togglerTrueProvider('darkTheme').notifier).set(value);
-            },
-          ),
-          // button that restarts the discovery
-          IconButton(
-            onPressed: () {
-              // ref.read(duktiClientsProvider.notifier).clear();
-              ref.invalidate(eventsProvider);
-            },
-            icon: const Icon(shadows: [
-              Shadow(
-                color: Colors.black,
-                offset: Offset(1, 1),
-                blurRadius: 2,
-              ),
-            ], Icons.refresh),
-          ),
+          Icon(isBroadcasting ? Icons.wifi : Icons.wifi_off),
+          SizedBox(width: 4),
           Switch(
             value: isBroadcasting,
             onChanged: (value) {
@@ -140,8 +122,16 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
         ],
       ),
       body: Container(
-        decoration: fancyBackground(useDarkTheme),
+        decoration: fancyBackground(Theme.of(context).brightness == Brightness.dark),
         child: ClientList(),
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Theme.of(context).colorScheme.surfaceDim,
+        onPressed: () {
+          ref.read(duktiClientsProvider.notifier).clear();
+          ref.invalidate(eventsProvider);
+        },
+        child: const Icon(Icons.refresh),
       ),
     );
   }
