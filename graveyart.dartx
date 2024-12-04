@@ -145,3 +145,56 @@ class AppLifecycleManagerState extends State<AppLifecycleManager> with WidgetsBi
     return widget.child;
   }
 }
+
+
+ void _uploadFile(WidgetRef ref) async {
+    final uploadProgressNotifier = ref.read(uploadProgressProvider.notifier);
+    final uploadSpeedNotifier = ref.read(uploadSpeedProvider.notifier);
+
+    final result = await FilePicker.platform.pickFiles();
+
+    if (result != null && result.files.single.path != null) {
+      final filePath = result.files.single.path!;
+      final fileName = result.files.single.name;
+
+      final uri = Uri.parse('http://${client.ip}:${client.port}/upload');
+      final request = http.MultipartRequest('POST', uri)
+        ..fields['clientId'] = clientId
+        ..files.add(await http.MultipartFile.fromPath('file', filePath, filename: fileName));
+
+      final startTime = DateTime.now();
+
+      try {
+        final streamedResponse = await request.send();
+
+        streamedResponse.stream.listen((value) {
+          final currentTime = DateTime.now();
+          final elapsedTime = currentTime.difference(startTime).inSeconds;
+          if (elapsedTime > 0) {
+            final speed = value.length / elapsedTime; // bytes per second
+            uploadSpeedNotifier.set(speed.toInt());
+          }
+          final progress = value.length / streamedResponse.contentLength!;
+          uploadProgressNotifier.set(progress);
+          // ref.read(uploadProgressStreamProvider.notifier).set(progress);
+
+          logger.e('Upload progress http: $progress');
+        }).onDone(() async {
+          if (streamedResponse.statusCode == 200) {
+            Future.delayed(const Duration(seconds: 1), () {
+              uploadProgressNotifier.set(0.0);
+              uploadSpeedNotifier.set(0);
+            });
+            logger.i('Upload complete');
+          } else {
+            logger.i('Upload failed: ${streamedResponse.statusCode}');
+          }
+        });
+      } catch (e) {
+        logger.i('Upload failed: $e');
+      }
+    }
+  }
+
+    // final uploadProgressStream = ref.watch(uploadProgressStreamProvider);
+    // final uploadProgress = uploadProgressStream.hasValue ? uploadProgressStream.value ?? 0.0 : 0.0;

@@ -64,10 +64,10 @@ class DuktiApp extends HookConsumerWidget {
       title: 'Dukti',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
       ),
       darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple, brightness: Brightness.dark),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green, brightness: Brightness.dark),
       ),
       // themeMode: useDarkTheme ? ThemeMode.dark : ThemeMode.light,
       home: const DuktiHome(title: 'Dukti!'),

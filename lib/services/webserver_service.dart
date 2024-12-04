@@ -84,12 +84,10 @@ Future<Response> _handleRequest(Request request, Ref ref) async {
 }
 
 Future<Response> _handleClipboard(Request request, Ref ref) async {
-  final clipboardService = ref.watch(clipboardServiceProvider.notifier);
-
   if (request.method == 'POST') {
     // set the local clipboard to the received clipboard text
     Map payload = jsonDecode(await request.readAsString());
-    clipboardService.set(payload['text']);
+    ref.read(clipboardServiceProvider.notifier).set(payload['text']);
     return Response.ok('Clipboard received');
   }
   return Response.notFound('Not Found');

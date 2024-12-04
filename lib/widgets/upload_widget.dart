@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -26,6 +27,24 @@ class UploadProgress extends _$UploadProgress {
 }
 
 @riverpod
+class UploadProgressStream extends _$UploadProgressStream {
+  final StreamController<double> _controller = StreamController<double>();
+
+  @override
+  Stream<double> build() {
+    ref.onDispose(() {
+      _controller.close();
+    });
+
+    return _controller.stream;
+  }
+
+  void set(double value) {
+    _controller.add(value);
+  }
+}
+
+@riverpod
 class UploadSpeed extends _$UploadSpeed {
   @override
   int build() {
@@ -33,6 +52,18 @@ class UploadSpeed extends _$UploadSpeed {
   }
 
   void set(int value) {
+    state = value;
+  }
+}
+
+@riverpod
+class FileSelectorOpen extends _$FileSelectorOpen {
+  @override
+  bool build() {
+    return false;
+  }
+
+  void set(bool value) {
     state = value;
   }
 }
@@ -49,11 +80,14 @@ class UploadButton extends ConsumerWidget {
   final DuktiClient client;
   const UploadButton({super.key, required this.client});
 
-  Future<void> _uploadFile(WidgetRef ref) async {
+  void _uploadFile(WidgetRef ref) async {
     final uploadProgressNotifier = ref.read(uploadProgressProvider.notifier);
     final uploadSpeedNotifier = ref.read(uploadSpeedProvider.notifier);
+    final fileSelectorOpen = ref.read(fileSelectorOpenProvider.notifier);
 
+    fileSelectorOpen.set(true);
     final result = await FilePicker.platform.pickFiles();
+    fileSelectorOpen.set(false);
 
     if (result != null && result.files.single.path != null) {
       final filePath = result.files.single.path!;
@@ -81,7 +115,9 @@ class UploadButton extends ConsumerWidget {
               final speed = sent / elapsedTime; // bytes per second
               uploadSpeedNotifier.set(speed.toInt());
             }
-            uploadProgressNotifier.set(sent / total);
+            final progress = sent / total;
+            uploadProgressNotifier.set(progress);
+            logger.t('Upload progress dio: $progress');
           },
         );
         Future.delayed(const Duration(seconds: 1), () {
@@ -100,10 +136,17 @@ class UploadButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final uploadProgress = ref.watch(uploadProgressProvider);
     final uploadSpeed = ref.watch(uploadSpeedProvider);
+    final fileSelectorOpen = ref.watch(fileSelectorOpenProvider);
+
+    logger.e('Upload progress build: $uploadProgress');
 
     return uploadProgress == 0.0
         ? FilledButton(
-            onPressed: () => _uploadFile(ref),
+            onPressed: fileSelectorOpen ? null : () => _uploadFile(ref),
+            style: ButtonStyle(
+              backgroundColor:
+                  WidgetStateProperty.all(fileSelectorOpen ? Colors.grey : Theme.of(context).colorScheme.primary),
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -114,7 +157,7 @@ class UploadButton extends ConsumerWidget {
             ),
           )
         : SizedBox(
-            width: 250,
+            // width: 250,
             child: Stack(
               alignment: Alignment.center,
               children: [
