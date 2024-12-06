@@ -6,7 +6,7 @@ part of 'client_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$duktiClientsHash() => r'5d0c9ca494564d215de98f3b58009bc50a2ddd16';
+String _$duktiClientsHash() => r'c5b1e8b336734245a64c8ebb90e758dc3e7bf20f';
 
 ///  Provider that holds the clients discovered by bonsoir
 ///

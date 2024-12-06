@@ -256,3 +256,68 @@ class AppLifecycleManagerState extends State<AppLifecycleManager> with WidgetsBi
 //     state = value;
 //   }
 // }
+
+
+
+// void uploadFile(
+//   String filePath,
+//   DuktiClient client,
+//   Function(double) updateProgress,
+//   Function(int) updateSpeed,
+// ) async {
+//   // fileSelectorOpen.set(true);
+//   // setState(() => fileSelectorOpen2 = true);
+
+//   // final result = await FilePicker.platform.pickFiles();
+
+//   // // fileSelectorOpen.set(false);
+//   // setState(() => fileSelectorOpen2 = false);
+
+//   // final filePath = '/data/user/0/com.atomar.dukti/cache/file_picker/1733349332034/youtube.apk';
+
+//   logger.i('Uploading file: $filePath');
+
+//   final dio = Dio();
+
+//   final formData = FormData.fromMap({
+//     'file': await MultipartFile.fromFile(filePath),
+//     'clientId': clientId,
+//   });
+
+//   final address = 'http://${client.ip}:${client.port}/upload';
+//   logger.i('Uploading to: $address');
+
+//   final startTime = DateTime.now();
+
+//   try {
+//     await dio.post(
+//       address,
+//       data: formData,
+//       onSendProgress: (int sent, int total) {
+//         // dependency injection of stream controller?
+
+//         final currentTime = DateTime.now();
+//         final elapsedTime = currentTime.difference(startTime).inSeconds;
+//         if (elapsedTime > 0) {
+//           final speed = sent / elapsedTime; // bytes per second
+
+//           // uploadSpeedNotifier.set(speed.toInt());
+//           updateSpeed(speed.toInt());
+//         }
+//         final progress = sent / total;
+
+//         // uploadProgressNotifier.set(progress);
+//         updateProgress(progress);
+
+//         // logger.t('Upload progress dio: $progress');
+//       },
+//     );
+//     Future.delayed(const Duration(seconds: 1), () {
+//       updateProgress(0.0);
+//     });
+
+//     logger.i('Upload complete');
+//   } catch (e) {
+//     logger.i('Upload failed: $e');
+//   }
+// }
