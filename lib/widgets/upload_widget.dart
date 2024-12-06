@@ -44,16 +44,6 @@ class _UploadButtonState extends ConsumerState<UploadButton> {
   CancelToken cancelToken = CancelToken();
 
   void _uploadFile(String filePath, DuktiClient client) async {
-    // fileSelectorOpen.set(true);
-    // setState(() => fileSelectorOpen2 = true);
-
-    // final result = await FilePicker.platform.pickFiles();
-
-    // // fileSelectorOpen.set(false);
-    // setState(() => fileSelectorOpen2 = false);
-
-    // final filePath = '/data/user/0/com.atomar.dukti/cache/file_picker/1733349332034/youtube.apk';
-
     logger.i('Uploading file: $filePath');
 
     final dio = Dio();
