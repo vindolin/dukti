@@ -18,7 +18,7 @@ class ClientScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final clients = ref.watch(duktiClientsProvider);
+    final clients = ref.read(duktiClientsProvider);
 
     if (!clients.containsKey(client.id)) {
       return Scaffold(
