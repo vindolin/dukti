@@ -98,7 +98,6 @@ class _UploadButtonState extends ConsumerState<UploadButton> {
         errorText = 'The upload was cancelled';
         cancelToken = CancelToken();
       }
-      logger.e('Upload failed: $e');
 
       /// Show an error message if the upload fails
       if (mounted) {
@@ -110,6 +109,8 @@ class _UploadButtonState extends ConsumerState<UploadButton> {
           ));
         });
       }
+
+      logger.e('$errorText: $e');
     }
   }
 
