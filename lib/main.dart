@@ -24,7 +24,7 @@ import 'utils/logger.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initPort();
-  logger.e('Using port $serverPort');
+  // logger.e('Using port $serverPort');
   await initClientName();
   bonsoir.startBroadcast();
 
@@ -42,22 +42,22 @@ class DuktiApp extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     logger.t('Building DuktiApp');
 
+    // This might have been a good idea, but after returning from the filePicker the app is not in the resumed state 😖
+    //
     // If the app is resumed, the client list is probably outdated, invalidate it and start a new discovery.
     final appLifecycleState = useAppLifecycleState();
     useEffect(() {
       if (!platformIsDesktop) {
         if (appLifecycleState == AppLifecycleState.resumed) {
-          // without the addPostFrameCallback, the error "Cannot listen to inherited widgets inside HookState.initState. Use HookState.build instead"
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            ref.invalidate(duktiClientsProvider); // clear the client list
-            ref.invalidate(bonsoir.eventsProvider); // restart the bonsoir discovery
+            logger.e('App resumed');
+            // ref.invalidate(duktiClientsProvider); // clear the client list
+            // ref.invalidate(bonsoir.eventsProvider); // restart the bonsoir discovery
           });
         }
       }
       return null;
     }, [appLifecycleState]);
-
-    // final useDarkTheme = ref.watch(togglerTrueProvider('darkTheme')); // always use the system theme
 
     return _EagerInitialization(
         child: MaterialApp(

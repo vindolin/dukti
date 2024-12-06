@@ -7,13 +7,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:bonsoir/bonsoir.dart' as bonsoir;
 
-import '../utils/platform_helper.dart';
+import '/utils/platform_helper.dart';
 import '/models/client_provider.dart';
-import '../utils/network_helper.dart' show lookupIP4, knockPort;
+import '/utils/network_helper.dart' show lookupIP4, knockPort;
 import '/models/client_name.dart';
 import '/services/server_port_service.dart' as server_port_service;
 
-import '../utils/logger.dart';
+import '/utils/logger.dart';
 
 part 'bonjour_service.g.dart';
 
@@ -134,6 +134,8 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
           // check if the client is still alive
           if (!await knockPort(ip, port)) {
             logger.t('Resolved dead client: $name $ip:$port');
+            // TODO remove the client from the clients provider
+            clients.remove(id);
             break;
           }
 

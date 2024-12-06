@@ -2,6 +2,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../utils/platform_helper.dart';
 
+import '/utils/logger.dart';
+
 part 'client_provider.g.dart';
 
 class DuktiClient {
@@ -28,6 +30,7 @@ class DuktiClient {
 class DuktiClients extends _$DuktiClients {
   @override
   Map<String, DuktiClient> build() {
+    logger.e('Building DuktiClients');
     return {};
   }
 
@@ -35,11 +38,8 @@ class DuktiClients extends _$DuktiClients {
     state = Map.from(state)..[client.id] = client;
   }
 
-  // void remove(String id) {
-  //   state = Map.from(state)..remove(id);
-  // }
-
   void remove(String name) {
+    logger.e('Removing client: $name');
     state = Map.from(state)..remove(name);
   }
 

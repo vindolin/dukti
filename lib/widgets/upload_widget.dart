@@ -36,73 +36,11 @@ FutureOr<String?> pickFile() async {
   return null;
 }
 
-void uploadFile(
-  String filePath,
-  DuktiClient client,
-  Function(double) updateProgress,
-  Function(int) updateSpeed,
-) async {
-  // fileSelectorOpen.set(true);
-  // setState(() => fileSelectorOpen2 = true);
-
-  // final result = await FilePicker.platform.pickFiles();
-
-  // // fileSelectorOpen.set(false);
-  // setState(() => fileSelectorOpen2 = false);
-
-  // final filePath = '/data/user/0/com.atomar.dukti/cache/file_picker/1733349332034/youtube.apk';
-
-  logger.i('Uploading file: $filePath');
-
-  final dio = Dio();
-
-  final formData = FormData.fromMap({
-    'file': await MultipartFile.fromFile(filePath),
-    'clientId': clientId,
-  });
-
-  final address = 'http://${client.ip}:${client.port}/upload';
-  logger.i('Uploading to: $address');
-
-  final startTime = DateTime.now();
-
-  try {
-    await dio.post(
-      address,
-      data: formData,
-      onSendProgress: (int sent, int total) {
-        // dependency injection of stream controller?
-
-        final currentTime = DateTime.now();
-        final elapsedTime = currentTime.difference(startTime).inSeconds;
-        if (elapsedTime > 0) {
-          final speed = sent / elapsedTime; // bytes per second
-
-          // uploadSpeedNotifier.set(speed.toInt());
-          updateSpeed(speed.toInt());
-        }
-        final progress = sent / total;
-
-        // uploadProgressNotifier.set(progress);
-        updateProgress(progress);
-
-        logger.t('Upload progress dio: $progress');
-      },
-    );
-    Future.delayed(const Duration(seconds: 1), () {
-      updateProgress(0.0);
-    });
-
-    logger.i('Upload complete');
-  } catch (e) {
-    logger.i('Upload failed: $e');
-  }
-}
-
 class _UploadButtonState extends ConsumerState<UploadButton> {
   bool fileSelectorOpen = false;
   double uploadProgress = 0.0;
   int uploadSpeed = 0;
+  bool uploadError = true;
 
   void _uploadFile(String filePath, DuktiClient client) async {
     // fileSelectorOpen.set(true);
@@ -150,30 +88,53 @@ class _UploadButtonState extends ConsumerState<UploadButton> {
           // uploadProgressNotifier.set(progress);
           if (mounted) setState(() => uploadProgress = progress);
 
-          logger.t('Upload progress dio: $progress');
+          // logger.t('Upload progress dio: $progress');
         },
       );
-      Future.delayed(const Duration(seconds: 1), () {
-        if (mounted) setState(() => uploadProgress = 0.0);
-        if (mounted) setState(() => uploadSpeed = 0);
+
+      /// Wait for the progress bar to reach 100% before resetting it after a short delay
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (mounted) {
+          setState(() {
+            uploadProgress = 0.0;
+            uploadSpeed = 0;
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text('The upload succeeded'),
+            ));
+          });
+        }
       });
 
       logger.i('Upload complete');
     } catch (e) {
-      logger.i('Upload failed: $e');
+      /// Show an error message if the upload fails
+      if (mounted) {
+        setState(() {
+          uploadProgress = 0.0;
+          uploadSpeed = 0;
+          uploadError = true;
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('The upload failed'),
+          ));
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    logger.e('Upload progress build: $uploadProgress');
+    // logger.e('Upload progress build: $uploadProgress');
 
     return uploadProgress == 0.0
         ? FilledButton(
             onPressed: () async {
               final filePath = await pickFile();
               if (filePath != null) {
-                _uploadFile(filePath, widget.client);
+                try {
+                  _uploadFile(filePath, widget.client);
+                } catch (e) {
+                  logger.e('Upload failed: $e');
+                }
               }
             },
             style: ButtonStyle(

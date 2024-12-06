@@ -8,6 +8,8 @@ import '/models/client_provider.dart';
 import '/widgets/upload_widget.dart';
 import '/services/clipboard_service.dart';
 
+import '/utils/logger.dart';
+
 class ClientScreen extends ConsumerWidget {
   final DuktiClient client;
 
@@ -18,9 +20,10 @@ class ClientScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final clients = ref.read(duktiClientsProvider);
+    logger.t('Building ClientScreen');
+    final clientInList = ref.watch(duktiClientsProvider.select((value) => value[client.id]));
 
-    if (!clients.containsKey(client.id)) {
+    if (clientInList == null) {
       return Scaffold(
         appBar: AppBar(
           title: Text('Client ${client.name}'),
