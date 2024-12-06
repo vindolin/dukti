@@ -3,69 +3,12 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 
 import '/models/client_name.dart';
 import '/models/client_provider.dart';
 import '/utils/logger.dart';
-
-// part 'upload_widget.g.dart';
-
-// @riverpod
-// class UploadProgress extends _$UploadProgress {
-//   @override
-//   double build() {
-//     return 0.0;
-//   }
-
-//   void set(double value) {
-//     state = value;
-//   }
-// }
-
-// @riverpod
-// class UploadProgressStream extends _$UploadProgressStream {
-//   final StreamController<double> _controller = StreamController<double>();
-
-//   @override
-//   Stream<double> build() {
-//     ref.onDispose(() {
-//       _controller.close();
-//     });
-
-//     return _controller.stream;
-//   }
-
-//   void set(double value) {
-//     _controller.add(value);
-//   }
-// }
-
-// @riverpod
-// class UploadSpeed extends _$UploadSpeed {
-//   @override
-//   int build() {
-//     return 0;
-//   }
-
-//   void set(int value) {
-//     state = value;
-//   }
-// }
-
-// @riverpod
-// class FileSelectorOpen extends _$FileSelectorOpen {
-//   @override
-//   bool build() {
-//     return false;
-//   }
-
-//   void set(bool value) {
-//     state = value;
-//   }
-// }
 
 String formatBytes(int bytes) {
   if (bytes <= 0) return '0 B/s';
