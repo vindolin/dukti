@@ -28,6 +28,10 @@ class ClipboardService extends _$ClipboardService {
   }
 }
 
+class EmptyClipboardException implements Exception {}
+
+class ClipboardException implements Exception {}
+
 sendClipboard(DuktiClient client) async {
   final clipboardData = await Clipboard.getData('text/plain');
   // logger.e('Clipboard data: ${clipboardData?.text}');
@@ -39,9 +43,10 @@ sendClipboard(DuktiClient client) async {
       );
       logger.i('Clipboard data sent: ${response.statusCode}');
     } catch (e) {
-      logger.e('Error sending clipboard data: $e');
+      throw ClipboardException();
     }
   } else {
-    logger.w('No clipboard data to send');
+    // logger.w('No clipboard data to send');
+    throw EmptyClipboardException();
   }
 }

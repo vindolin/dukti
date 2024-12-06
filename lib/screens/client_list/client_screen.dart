@@ -110,7 +110,21 @@ class ClientScreen extends ConsumerWidget {
                           padding: const EdgeInsets.only(top: 16.0),
                           child: FilledButton(
                             onPressed: () async {
-                              await sendClipboard(client);
+                              try {
+                                await sendClipboard(client);
+                              } on EmptyClipboardException catch (_) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                    content: Text('The clipboard is empty'),
+                                  ));
+                                }
+                              } on ClipboardException catch (_) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                    content: Text('Failed to send clipboard'),
+                                  ));
+                                }
+                              }
                             },
                             child: Row(
                               // mainAxisSize: MainAxisSize.min,

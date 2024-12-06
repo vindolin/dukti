@@ -40,7 +40,8 @@ class _UploadButtonState extends ConsumerState<UploadButton> {
   bool fileSelectorOpen = false;
   double uploadProgress = 0.0;
   int uploadSpeed = 0;
-  bool uploadError = true;
+  bool stopUpload = false;
+  CancelToken cancelToken = CancelToken();
 
   void _uploadFile(String filePath, DuktiClient client) async {
     // fileSelectorOpen.set(true);
@@ -70,25 +71,20 @@ class _UploadButtonState extends ConsumerState<UploadButton> {
 
     try {
       await dio.post(
+        cancelToken: cancelToken,
         address,
         data: formData,
-        onSendProgress: (int sent, int total) {
-          // dependency injection of stream controller?
-
+        onSendProgress: (int sent, int total) async {
           final currentTime = DateTime.now();
           final elapsedTime = currentTime.difference(startTime).inSeconds;
           if (elapsedTime > 0) {
             final speed = sent / elapsedTime; // bytes per second
 
-            // uploadSpeedNotifier.set(speed.toInt());
             if (mounted) setState(() => uploadSpeed = speed.toInt());
           }
           final progress = sent / total;
 
-          // uploadProgressNotifier.set(progress);
           if (mounted) setState(() => uploadProgress = progress);
-
-          // logger.t('Upload progress dio: $progress');
         },
       );
 
@@ -107,14 +103,20 @@ class _UploadButtonState extends ConsumerState<UploadButton> {
 
       logger.i('Upload complete');
     } catch (e) {
+      String errorText = 'The upload failed';
+      if (cancelToken.isCancelled) {
+        errorText = 'The upload was cancelled';
+        cancelToken = CancelToken();
+      }
+      logger.e('Upload failed: $e');
+
       /// Show an error message if the upload fails
       if (mounted) {
         setState(() {
           uploadProgress = 0.0;
           uploadSpeed = 0;
-          uploadError = true;
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('The upload failed'),
+            content: Text(errorText),
           ));
         });
       }
@@ -180,6 +182,9 @@ class _UploadButtonState extends ConsumerState<UploadButton> {
                     ),
                   ],
                 ),
+                Align(
+                    alignment: Alignment.topRight,
+                    child: IconButton(onPressed: () => cancelToken.cancel(), icon: Icon(Icons.clear))),
               ],
             ),
           );
