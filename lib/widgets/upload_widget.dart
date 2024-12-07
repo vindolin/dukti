@@ -119,20 +119,22 @@ class _UploadButtonState extends ConsumerState<UploadButton> {
 
     return !uploading
         ? FilledButton(
-            onPressed: () async {
-              setState(() => fileSelectorOpen = true);
-              final filePath = await pickFile();
-              setState(() => fileSelectorOpen = false);
+            onPressed: fileSelectorOpen
+                ? null
+                : () async {
+                    setState(() => fileSelectorOpen = true);
+                    final filePath = await pickFile();
+                    setState(() => fileSelectorOpen = false);
 
-              if (filePath != null) {
-                try {
-                  setState(() => uploading = true);
-                  _uploadFile(filePath, widget.client);
-                } catch (e) {
-                  logger.e('Upload failed: $e');
-                }
-              }
-            },
+                    if (filePath != null) {
+                      try {
+                        setState(() => uploading = true);
+                        _uploadFile(filePath, widget.client);
+                      } catch (e) {
+                        logger.e('Upload failed: $e');
+                      }
+                    }
+                  },
             style: ButtonStyle(
               backgroundColor:
                   WidgetStateProperty.all(fileSelectorOpen ? Colors.grey : Theme.of(context).colorScheme.primary),
@@ -177,7 +179,10 @@ class _UploadButtonState extends ConsumerState<UploadButton> {
                 ),
                 Align(
                     alignment: Alignment.topRight,
-                    child: IconButton(onPressed: () => cancelToken.cancel(), icon: Icon(Icons.clear))),
+                    child: IconButton(
+                      onPressed: () => cancelToken.cancel(),
+                      icon: Icon(Icons.clear),
+                    )),
               ],
             ),
           );
