@@ -26,6 +26,7 @@ class UploadButton extends ConsumerStatefulWidget {
   ConsumerState<UploadButton> createState() => _UploadButtonState();
 }
 
+/// Opens a file picker dialog and returns the path of the selected file
 FutureOr<String?> pickFile() async {
   final result = await FilePicker.platform.pickFiles();
   if (result != null && result.files.single.path != null) {
@@ -37,15 +38,15 @@ FutureOr<String?> pickFile() async {
 }
 
 class _UploadButtonState extends ConsumerState<UploadButton> {
-  bool fileSelectorOpen = false;
+  bool fileSelectorOpen = false; // controls if the file select button is enabled
+  bool uploading = false; // controls the visibility of the button/progress bar
   double uploadProgress = 0.0;
   int uploadSpeed = 0;
-  bool stopUpload = false;
   CancelToken cancelToken = CancelToken();
 
+  /// Uploads a file to the client using Dio
   void _uploadFile(String filePath, DuktiClient client) async {
     logger.i('Uploading file: $filePath');
-
     final dio = Dio();
 
     final formData = FormData.fromMap({
@@ -109,8 +110,9 @@ class _UploadButtonState extends ConsumerState<UploadButton> {
           ));
         });
       }
-
       logger.e('$errorText: $e');
+    } finally {
+      if (mounted) setState(() => uploading = false);
     }
   }
 
@@ -118,12 +120,16 @@ class _UploadButtonState extends ConsumerState<UploadButton> {
   Widget build(BuildContext context) {
     // logger.e('Upload progress build: $uploadProgress');
 
-    return uploadProgress == 0.0
+    return !uploading
         ? FilledButton(
             onPressed: () async {
+              setState(() => fileSelectorOpen = true);
               final filePath = await pickFile();
+              setState(() => fileSelectorOpen = false);
+
               if (filePath != null) {
                 try {
+                  setState(() => uploading = true);
                   _uploadFile(filePath, widget.client);
                 } catch (e) {
                   logger.e('Upload failed: $e');
@@ -144,7 +150,6 @@ class _UploadButtonState extends ConsumerState<UploadButton> {
             ),
           )
         : SizedBox(
-            // width: 250,
             child: Stack(
               alignment: Alignment.center,
               children: [
