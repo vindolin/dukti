@@ -18,6 +18,7 @@ String formatBytes(int bytes) {
   return '${size.toStringAsFixed(2)} ${suffixes[i]}';
 }
 
+/// A widget that either shows a button to select a file or a progress bar while uploading
 class UploadButton extends ConsumerStatefulWidget {
   final DuktiClient client;
   const UploadButton({super.key, required this.client});
@@ -69,13 +70,9 @@ class _UploadButtonState extends ConsumerState<UploadButton> {
           final currentTime = DateTime.now();
           final elapsedTime = currentTime.difference(startTime).inSeconds;
           if (elapsedTime > 0) {
-            final speed = sent / elapsedTime; // bytes per second
-
-            if (mounted) setState(() => uploadSpeed = speed.toInt());
+            if (mounted) setState(() => uploadSpeed = sent ~/ elapsedTime);
           }
-          final progress = sent / total;
-
-          if (mounted) setState(() => uploadProgress = progress);
+          if (mounted) setState(() => uploadProgress = sent / total);
         },
       );
 
