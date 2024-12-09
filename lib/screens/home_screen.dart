@@ -5,9 +5,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 import '/models/client_provider.dart';
 import '/styles/decorations.dart';
-import '/models/client_name.dart';
 import '/services/bonjour_service.dart';
 import '/services/clipboard_service.dart';
+import '/widgets/app_bar_widget.dart';
 import 'client_list/widgets/client_list_widget.dart';
 
 import '../utils/logger.dart';
@@ -84,49 +84,7 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text.rich(
-          TextSpan(
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurface,
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-            ),
-            children: [
-              TextSpan(
-                text: clientName, //🖥️
-              ),
-              TextSpan(
-                text: ' $clientId',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onPrimary,
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          Icon(isBroadcasting ? Icons.wifi : Icons.wifi_off),
-          SizedBox(width: 4),
-          SizedBox(
-            width: 64,
-            height: 32,
-            child: FittedBox(
-              child: Switch(
-                value: isBroadcasting,
-                onChanged: (value) {
-                  setState(() {
-                    isBroadcasting = value;
-                    isBroadcasting ? startBroadcast() : stopBroadcast();
-                  });
-                },
-              ),
-            ),
-          ),
-        ],
-      ),
+      appBar: DuktiAppBar(),
       body: Container(
         decoration: fancyBackground(Theme.of(context).brightness == Brightness.dark),
         child: ClientList(),
