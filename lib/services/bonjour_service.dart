@@ -174,3 +174,16 @@ Stream<List<bonsoir.BonsoirDiscoveryEvent>> events(Ref ref) async* {
     }
   }
 }
+
+/// provider for the broadcast status
+@riverpod
+class IsBroadcasting extends _$IsBroadcasting {
+  @override
+  bool build() {
+    return true;
+  }
+
+  void set(bool value) {
+    state = value;
+  }
+}

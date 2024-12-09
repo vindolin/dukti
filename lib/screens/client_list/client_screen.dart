@@ -3,10 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:markup_text/markup_text.dart';
 
 import '/styles/decorations.dart';
-import '/widgets/platform_icon_widget.dart';
 import '/models/client_provider.dart';
-import '/widgets/upload_widget.dart';
 import '/services/clipboard_service.dart';
+import '/widgets/app_bar_widget.dart';
+import '/widgets/platform_icon_widget.dart';
+import '/widgets/upload_widget.dart';
 
 import '/utils/logger.dart';
 
@@ -25,9 +26,7 @@ class ClientScreen extends ConsumerWidget {
 
     if (clientInList == null) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text('Client ${client.name}'),
-        ),
+        appBar: DuktiAppBar(),
         body: Center(
           child: Text('Client not found'),
         ),
@@ -37,10 +36,7 @@ class ClientScreen extends ConsumerWidget {
     final hostInfoStyle = TextStyle(fontSize: 24);
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(client.name),
-      ),
+      appBar: DuktiAppBar(),
       body: Container(
         decoration: fancyBackground(Theme.of(context).brightness == Brightness.dark),
         child: Padding(
@@ -53,9 +49,9 @@ class ClientScreen extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Center(child: Text('Client', style: TextStyle(fontSize: 42, fontWeight: FontWeight.bold))),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      // mainAxisSize: MainAxisSize.min,
                       children: [
                         PlatformIcon(platform: client.platform!),
                         SizedBox(width: 8),
