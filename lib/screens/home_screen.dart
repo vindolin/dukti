@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import '/models/client_provider.dart';
-import '/styles/decorations.dart';
 import '/services/bonjour_service.dart';
 import '/services/clipboard_service.dart';
+import '/styles/decorations.dart';
 import '/widgets/app_bar_widget.dart';
 import 'client_list/widgets/client_list_widget.dart';
 
