@@ -16,7 +16,8 @@ part 'webserver_service.g.dart';
 
 class Upload {
   final int fileId;
-  final String filename;
+  final String fileName;
+  final String filePath;
   final int contentLength;
   final String clientId;
   int bytesReceived = 0;
@@ -25,7 +26,8 @@ class Upload {
 
   Upload({
     required this.fileId,
-    required this.filename,
+    required this.fileName,
+    required this.filePath,
     required this.contentLength,
     required this.clientId,
   });
@@ -140,11 +142,10 @@ Future<Response> _receiveUpload(Request request, Ref ref) async {
           final upload = Upload(
             fileId: fileId++,
             clientId: clientId!,
-            filename: filename!,
+            fileName: filename!,
+            filePath: file.path,
             contentLength: contentLength,
           );
-
-          //
 
           try {
             // Write data chunks directly to the file

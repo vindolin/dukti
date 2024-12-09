@@ -2,6 +2,7 @@ import 'package:animated_list_plus/transitions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:animated_list_plus/animated_list_plus.dart';
+import 'package:open_file/open_file.dart';
 
 import '/services/webserver_service.dart';
 import '/models/client_provider.dart';
@@ -84,78 +85,81 @@ class ClientListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: client.platform != null
-          ? PlatformIcon(platform: client.platform!)
-          : SizedBox(width: 24, height: 24, child: CircularProgressIndicator()),
-      title: Text.rich(
-        TextSpan(
+    return Tooltip(
+      message: 'Open client',
+      child: ListTile(
+        leading: client.platform != null
+            ? PlatformIcon(platform: client.platform!)
+            : SizedBox(width: 24, height: 24, child: CircularProgressIndicator()),
+        title: Text.rich(
+          TextSpan(
+            children: [
+              TextSpan(
+                style: TextStyle(
+                  color: textColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+                text: client.name,
+              ),
+              TextSpan(
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 18,
+                ),
+                text: ' ${client.id}',
+              ),
+            ],
+          ),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextSpan(
-              style: TextStyle(
-                color: textColor,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
+            Text.rich(
+              overflow: TextOverflow.ellipsis,
+              TextSpan(
+                children: client.ip != null
+                    ? [
+                        TextSpan(
+                          text: client.ip,
+                          style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
+                        ),
+                        TextSpan(
+                          text: ':${client.port}',
+                          style: const TextStyle(color: Colors.green),
+                        ),
+                        TextSpan(
+                          text: ' (${client.host})',
+                          style: const TextStyle(color: Colors.grey),
+                        )
+                      ]
+                    : [
+                        const TextSpan(
+                          text: 'resolving...',
+                          style: TextStyle(color: Colors.black),
+                        )
+                      ],
               ),
-              text: client.name,
             ),
-            TextSpan(
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: 18,
+            Padding(
+              padding: const EdgeInsets.only(top: 4.0),
+              child: UploadList(
+                client: client,
               ),
-              text: ' ${client.id}',
-            ),
+            )
           ],
         ),
+        onTap: client.ip != null
+            ? () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ClientScreen(client: client),
+                  ),
+                );
+              }
+            : null,
       ),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text.rich(
-            overflow: TextOverflow.ellipsis,
-            TextSpan(
-              children: client.ip != null
-                  ? [
-                      TextSpan(
-                        text: client.ip,
-                        style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
-                      ),
-                      TextSpan(
-                        text: ':${client.port}',
-                        style: const TextStyle(color: Colors.green),
-                      ),
-                      TextSpan(
-                        text: ' (${client.host})',
-                        style: const TextStyle(color: Colors.grey),
-                      )
-                    ]
-                  : [
-                      const TextSpan(
-                        text: 'resolving...',
-                        style: TextStyle(color: Colors.black),
-                      )
-                    ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 4.0),
-            child: UploadList(
-              client: client,
-            ),
-          )
-        ],
-      ),
-      onTap: client.ip != null
-          ? () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ClientScreen(client: client),
-                ),
-              );
-            }
-          : null,
     );
   }
 }
@@ -180,34 +184,41 @@ class UploadList extends ConsumerWidget {
             children: uploads.values.map((upload) {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 4.0),
-                child: Stack(
-                  children: [
-                    SizedBox(
-                      height: 24,
-                      child: LinearProgressIndicator(
-                        borderRadius: BorderRadius.circular(4),
-                        value: upload.progress,
-                        color: Colors.green,
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 4.0),
-                        child: Text(
-                          style: TextStyle(color: Colors.black, fontSize: 12),
-                          upload.filename,
-                          overflow: TextOverflow.ellipsis,
+                child: Tooltip(
+                  message: 'Open file',
+                  child: GestureDetector(
+                    onTap: () async {
+                      await OpenFile.open(upload.filePath);
+                    },
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        SizedBox(
+                          height: 24,
+                          child: LinearProgressIndicator(
+                            borderRadius: BorderRadius.circular(12),
+                            value: upload.progress,
+                            color: Colors.green,
+                          ),
                         ),
-                      ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Text(
+                            style: TextStyle(color: Theme.of(context).colorScheme.surface, fontSize: 12),
+                            upload.fileName,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               );
             }).toList(),
           ),
         ),
         IconButton(
+          tooltip: 'Clear uploads',
           onPressed: () async {
             ref.read(uploadProgressProvider.notifier).clear(client.id);
           },

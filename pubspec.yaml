@@ -32,6 +32,7 @@ dependencies:
   markup_text: ^1.0.4
   http: ^1.2.2
   file_selector: ^1.0.3
+  open_file: ^3.5.10
 
 dev_dependencies:
   flutter_test:
