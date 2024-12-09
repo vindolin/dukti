@@ -9,8 +9,9 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:path_provider/path_provider.dart';
 
-import '../utils/logger.dart';
 import '/services/clipboard_service.dart';
+
+import '../utils/logger.dart';
 
 part 'webserver_service.g.dart';
 
@@ -33,7 +34,6 @@ class Upload {
   });
 }
 
-//TODO allow the same file to be uploaded only once
 @Riverpod(keepAlive: true)
 class UploadProgress extends _$UploadProgress {
   @override
@@ -46,10 +46,6 @@ class UploadProgress extends _$UploadProgress {
     state[clientId]![upload.fileId] = upload;
     state = Map.from(state);
   }
-
-  // void remove(String filename) {
-  //   state = Map.from(state)..remove(filename);
-  // }
 
   void clear(clientId) {
     state = Map.from(state)..remove(clientId);
@@ -72,19 +68,23 @@ Future<void> startWebServer(Ref ref, int port) async {
   });
 }
 
+/// Handles incoming requests
 Future<Response> _handleRequest(Request request, Ref ref) async {
   if (request.method == 'POST') {
     // both upload and clipboard requests are POST requests
 
     if (request.url.path == 'clipboard') {
+      // delegate clipboard requests to the clipboard service
       return _handleClipboard(request, ref);
     } else if (request.url.path == 'upload') {
+      // delegate upload requests to the upload handler
       return _receiveUpload(request, ref);
     }
   }
   return Response.notFound('Not Found');
 }
 
+/// Handles incoming clipboard requests
 Future<Response> _handleClipboard(Request request, Ref ref) async {
   if (request.method == 'POST') {
     // set the local clipboard to the received clipboard text
