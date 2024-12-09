@@ -70,17 +70,15 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
   @override
   Widget build(BuildContext context) {
     logger.t('Building DuktiHome');
-    final clipboardStream = ref.watch(clipboardServiceProvider);
+    final clipboard = ref.watch(clipboardServiceProvider);
     // final useDarkTheme = ref.watch(togglerTrueProvider('darkTheme'));
 
-    // show snackbar on socket event
-    if (clipboardStream.hasValue) {
-      final clipboardData = clipboardStream.value;
-      if (clipboardData != null) {
-        // logger.e('Clipboard data: $clipboardData');
-        Clipboard.setData(ClipboardData(text: clipboardData));
-        _showToast(clipboardStream.value.toString());
-      }
+    if (clipboard != null) {
+      Clipboard.setData(ClipboardData(text: clipboard));
+      _showToast(clipboard.toString());
+      Future.delayed(const Duration(seconds: 2), () {
+        ref.read(clipboardServiceProvider.notifier).set(null);
+      });
     }
 
     return Scaffold(
