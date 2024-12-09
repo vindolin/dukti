@@ -149,20 +149,6 @@ class ClientScreen extends ConsumerWidget {
           ),
         ),
       ),
-      // bottomNavigationBar: BottomAppBar(
-      //   child: Row(
-      //     mainAxisAlignment: MainAxisAlignment.end,
-      //     children: [
-      //       UploadWidget(client: client),
-      //       IconButton(
-      //         onPressed: () async {
-      //           await sendClipboard(client);
-      //         },
-      //         icon: const Icon(Icons.paste),
-      //       ),
-      //     ],
-      //   ),
-      // ),
     );
   }
 }

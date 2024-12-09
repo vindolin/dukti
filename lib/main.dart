@@ -8,7 +8,6 @@ import '/screens/home_screen.dart';
 import '/services/bonjour_service.dart' as bonsoir;
 import '/services/server_port_service.dart';
 import '/models/client_name.dart';
-import '/models/client_provider.dart';
 import '/services/webserver_service.dart';
 import 'utils/platform_helper.dart';
 
