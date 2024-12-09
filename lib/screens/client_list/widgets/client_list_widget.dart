@@ -175,7 +175,7 @@ class UploadList extends ConsumerWidget {
     if (uploads == null) {
       return SizedBox.shrink();
     }
-    logger.e(uploads);
+    // logger.e(uploads);
 
     return Row(
       children: [
@@ -203,10 +203,13 @@ class UploadList extends ConsumerWidget {
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text(
-                            style: TextStyle(color: Theme.of(context).colorScheme.surface, fontSize: 12),
-                            upload.fileName,
-                            overflow: TextOverflow.ellipsis,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              style: TextStyle(color: Theme.of(context).colorScheme.surface, fontSize: 12),
+                              upload.fileName,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ),
                       ],

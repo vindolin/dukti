@@ -71,6 +71,7 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
   Widget build(BuildContext context) {
     logger.t('Building DuktiHome');
     final clipboard = ref.watch(clipboardServiceProvider);
+    final clients = ref.watch(duktiClientsProvider);
     // final useDarkTheme = ref.watch(togglerTrueProvider('darkTheme'));
 
     if (clipboard != null) {
@@ -85,9 +86,14 @@ class _DuktiHomeState extends ConsumerState<DuktiHome> {
       appBar: DuktiAppBar(),
       body: Container(
         decoration: fancyBackground(Theme.of(context).brightness == Brightness.dark),
-        child: ClientList(),
+        child: clients.isEmpty
+            ? const Center(
+                child: Text('Looks like we are alone here...'),
+              )
+            : const ClientList(),
       ),
       floatingActionButton: FloatingActionButton(
+        tooltip: 'Restart client discovery',
         backgroundColor: Theme.of(context).colorScheme.surfaceDim,
         onPressed: () {
           ref.read(duktiClientsProvider.notifier).clear();
