@@ -134,7 +134,7 @@ Future<Response> _receiveUpload(Request request, Ref ref) async {
           final filename = filenameMatch != null ? filenameMatch.group(1) : 'uploaded_file';
 
           // Create file to write to
-          final directory = await getApplicationDocumentsDirectory();
+          final directory = await getDownloadsDirectory() ?? await getApplicationDocumentsDirectory();
           final file = File('${directory.path}/$filename');
           final fileSink = file.openWrite();
 
