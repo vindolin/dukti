@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 
+import '/services/dio_service.dart';
 import '/models/client_name.dart';
 import '/models/client_provider.dart';
 import '/utils/logger.dart';
@@ -48,21 +49,20 @@ class _UploadButtonState extends ConsumerState<UploadButton> {
   /// Uploads a file to the client using Dio
   void _uploadFile(String filePath, DuktiClient client) async {
     logger.i('Uploading file: $filePath');
-    final dio = Dio();
 
     final formData = FormData.fromMap({
       'file': await MultipartFile.fromFile(filePath),
       'clientId': clientId,
     });
 
-    final address = 'http://${client.ip}:${client.port}/upload';
+    final address = 'https://${client.ip}:${client.port}/upload';
 
     logger.i('Uploading to: $address');
 
     final startTime = DateTime.now();
 
     try {
-      await dio.post(
+      await createDio('https://${client.host}:${client.port}').post(
         cancelToken: cancelToken,
         address,
         data: formData,

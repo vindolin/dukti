@@ -1,7 +1,7 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '/services/dio_service.dart';
 import '/models/client_provider.dart';
 
 import '../utils/logger.dart';
@@ -29,8 +29,9 @@ sendClipboard(DuktiClient client) async {
   // logger.e('Clipboard data: ${clipboardData?.text}');
   if (clipboardData != null && clipboardData.text != null) {
     try {
-      final response = await Dio().post(
-        'http://${client.host}:${client.port}/clipboard',
+      // final response = await Dio().post(
+      final response = await createDio('https://${client.host}:${client.port}').post(
+        '/clipboard',
         data: {'text': clipboardData.text},
       );
       logger.i('Clipboard data sent: ${response.statusCode}');

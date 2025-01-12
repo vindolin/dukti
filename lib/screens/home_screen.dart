@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +28,8 @@ class DuktiHome extends ConsumerWidget {
       Future(() {
         if (context.mounted) {
           return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Clipboard received:\n${clipboard.substring(0, 100)}', overflow: TextOverflow.ellipsis),
+            content: Text('Clipboard received:\n${clipboard.substring(0, math.min(clipboard.length, 100))}',
+                overflow: TextOverflow.ellipsis),
           ));
         }
       });

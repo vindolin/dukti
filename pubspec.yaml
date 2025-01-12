@@ -47,6 +47,7 @@ dev_dependencies:
 flutter:
   assets:
     - assets/images/
+    - assets/certificate/
 
   uses-material-design: true
 

@@ -2,18 +2,24 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:mime/mime.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:path_provider/path_provider.dart';
 
+import '/globals.dart' show snackbarKey;
 import '/services/clipboard_service.dart';
 
 import '../utils/logger.dart';
 
 part 'webserver_service.g.dart';
+
+late final Directory downloadDirectory;
 
 class Upload {
   final int fileId;
@@ -54,11 +60,23 @@ class UploadProgress extends _$UploadProgress {
 
 @riverpod
 Future<void> startWebServer(Ref ref, int port) async {
+  final certData = await rootBundle.load('assets/certificate/cert.pem');
+  final keyData = await rootBundle.load('assets/certificate/key.pem');
+  final securityContext = SecurityContext.defaultContext;
+  securityContext.useCertificateChainBytes(certData.buffer.asUint8List());
+  securityContext.usePrivateKeyBytes(keyData.buffer.asUint8List());
+
+  if (Platform.operatingSystem == 'android') {
+    downloadDirectory = Directory('/storage/emulated/0/Download');
+  } else {
+    downloadDirectory = await getApplicationDocumentsDirectory();
+  }
+
   final handler = const Pipeline().addMiddleware(logRequests()).addHandler(
         (request) => _handleRequest(request, ref),
       );
 
-  final server = await shelf_io.serve(handler, '0.0.0.0', port);
+  final server = await shelf_io.serve(handler, '0.0.0.0', port, securityContext: securityContext);
   logger.i('Server listening on port ${server.port}');
 
   // Dispose the server when the provider is destroyed
@@ -133,9 +151,11 @@ Future<Response> _receiveUpload(Request request, Ref ref) async {
           final filenameMatch = RegExp(r'filename="([^"]*)"').firstMatch(contentDisposition);
           final filename = filenameMatch != null ? filenameMatch.group(1) : 'uploaded_file';
 
+          await Permission.manageExternalStorage.request();
+
           // Create file to write to
-          final directory = await getDownloadsDirectory() ?? await getApplicationDocumentsDirectory();
-          final file = File('${directory.path}/$filename');
+          logger.i('Saving file to: ${downloadDirectory.path}/$filename');
+          final file = File('${downloadDirectory.path}/$filename');
           final fileSink = file.openWrite();
 
           // Create an Upload object and add it to UploadProgressList
@@ -166,12 +186,15 @@ Future<Response> _receiveUpload(Request request, Ref ref) async {
             uploadProgress.add(clientId, upload);
 
             await fileSink.close();
+            snackbarKey.currentState?.showSnackBar(
+              SnackBar(content: Text('File saved: ${file.path}')),
+            );
             logger.i('File saved: ${file.path}');
           } catch (e) {
             // Delete the partially downloaded file if an error occurs
+            logger.i('Deleting Partial file due to error: $e');
             if (await file.exists()) {
               await file.delete();
-              logger.i('Partial file deleted due to error: $e');
             }
             rethrow;
           }

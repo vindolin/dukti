@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter/material.dart';
 
+import '/globals.dart' show snackbarKey;
 import '/screens/home_screen.dart';
 import '/services/bonjour_service.dart' as bonsoir;
 import '/services/server_port_service.dart';
@@ -61,6 +62,7 @@ class DuktiApp extends HookConsumerWidget {
     return _EagerInitialization(
         child: MaterialApp(
       title: 'Dukti',
+      scaffoldMessengerKey: snackbarKey,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
