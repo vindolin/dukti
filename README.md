@@ -10,4 +10,4 @@
 
 ### Screenshots
 
-<img src="https://raw.githubusercontent.com/vindolin/dukti/refs/heads/main/dev/screenshot1.png" width="200"> <img src="https://raw.githubusercontent.com/vindolin/dukti/refs/heads/main/dev/screenshot2.png" width="200">
+<img src="dev/screenshot1.png" width="200"> <img src="dev/screenshot2.png" width="200">
