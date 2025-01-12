@@ -6,7 +6,7 @@ part of 'webserver_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$startWebServerHash() => r'f11c9f4b27fdea36f4c148cf889cc5d52939f9fa';
+String _$startWebServerHash() => r'aa4acc76b0435a3917441a73a2b7061c44df4d98';
 
 /// Copied from Dart SDK
 class _SystemHash {
