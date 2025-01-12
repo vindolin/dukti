@@ -14,6 +14,7 @@ class DuktiAppBar extends ConsumerWidget implements PreferredSizeWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isBroadcasting = ref.watch(isBroadcastingProvider);
 
+    /// AppBar that shows the client name and ID
     return AppBar(
       backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       title: Text.rich(
@@ -44,6 +45,7 @@ class DuktiAppBar extends ConsumerWidget implements PreferredSizeWidget {
           width: 64,
           height: 32,
           child: FittedBox(
+            /// Switch to toggle the broadcasting
             child: Switch(
               value: isBroadcasting,
               onChanged: (value) {

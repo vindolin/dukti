@@ -46,7 +46,7 @@ class _UploadButtonState extends ConsumerState<UploadButton> {
   int uploadSpeed = 0;
   CancelToken cancelToken = CancelToken();
 
-  /// Uploads a file to the client using Dio
+  /// Uploads a file to the client using Dio HTTPS
   void _uploadFile(String filePath, DuktiClient client) async {
     logger.i('Uploading file: $filePath');
 
@@ -62,7 +62,7 @@ class _UploadButtonState extends ConsumerState<UploadButton> {
     final startTime = DateTime.now();
 
     try {
-      await createDio('https://${client.host}:${client.port}').post(
+      await createDio('https://${client.ip}:${client.port}').post(
         cancelToken: cancelToken,
         address,
         data: formData,
@@ -115,9 +115,9 @@ class _UploadButtonState extends ConsumerState<UploadButton> {
 
   @override
   Widget build(BuildContext context) {
-    // logger.e('Upload progress build: $uploadProgress');
-
     return !uploading
+
+        /// Show a button to select a file
         ? FilledButton(
             onPressed: fileSelectorOpen
                 ? null
@@ -148,6 +148,8 @@ class _UploadButtonState extends ConsumerState<UploadButton> {
               ],
             ),
           )
+
+        /// Show a progress bar while uploading
         : SizedBox(
             child: Stack(
               alignment: Alignment.center,
@@ -180,6 +182,7 @@ class _UploadButtonState extends ConsumerState<UploadButton> {
                 Align(
                     alignment: Alignment.topRight,
                     child: IconButton(
+                      /// Cancel the upload
                       onPressed: () => cancelToken.cancel(),
                       icon: Icon(Icons.clear),
                     )),

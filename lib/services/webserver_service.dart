@@ -115,6 +115,7 @@ Future<Response> _handleClipboard(Request request, Ref ref) async {
 
 int fileId = 0;
 
+/// Handles incoming file uploads
 Future<Response> _receiveUpload(Request request, Ref ref) async {
   try {
     final contentType = request.headers['content-type'];

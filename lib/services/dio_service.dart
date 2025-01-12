@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 
+/// Dio instance with self-signed certificate support
 Dio createDio(String baseUrl) {
   // initialize dio
   final dio = Dio()..options.baseUrl = baseUrl;

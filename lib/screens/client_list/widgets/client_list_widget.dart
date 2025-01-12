@@ -11,6 +11,7 @@ import '../client_screen.dart';
 
 import '/utils/logger.dart';
 
+/// List of clients discovered by the Bonjour service
 class ClientList extends ConsumerWidget {
   const ClientList({
     super.key,
@@ -62,7 +63,6 @@ class ClientList extends ConsumerWidget {
                     ),
                     child: ClientListTile(client: client, textColor: textColor),
                   ),
-                  // const Divider(height: 0),
                 ],
               ),
             );
