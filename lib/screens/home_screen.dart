@@ -13,6 +13,7 @@ import 'client_list/widgets/client_list_widget.dart';
 
 import '../utils/logger.dart';
 
+/// Home screen of the app
 class DuktiHome extends ConsumerWidget {
   final String title;
   const DuktiHome({super.key, required this.title});
@@ -22,8 +23,8 @@ class DuktiHome extends ConsumerWidget {
     logger.t('Building DuktiHome');
     final clipboard = ref.watch(clipboardServiceProvider);
     final clients = ref.watch(duktiClientsProvider);
-    // final useDarkTheme = ref.watch(togglerTrueProvider('darkTheme'));
 
+    /// Show a snackbar if the clipboard has content
     if (clipboard != null) {
       Future(() {
         if (context.mounted) {
@@ -51,6 +52,8 @@ class DuktiHome extends ConsumerWidget {
               )
             : const ClientList(),
       ),
+
+      /// Floating action button to restart the client discovery
       floatingActionButton: FloatingActionButton(
         tooltip: 'Restart client discovery',
         backgroundColor: Theme.of(context).colorScheme.surfaceDim,

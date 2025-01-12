@@ -49,7 +49,7 @@ class ClientScreen extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Center(child: Text('Client', style: TextStyle(fontSize: 42, fontWeight: FontWeight.bold))),
+                    /// The client's platform icon and name.
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -67,6 +67,8 @@ class ClientScreen extends ConsumerWidget {
                         ),
                       ],
                     ),
+
+                    /// Client information, including the platform icon, name, ID, host, IP, and port.
                     SizedBox(height: 16),
                     MarkupText(
                       '(b)ID(/b): ${client.id}',
@@ -104,6 +106,8 @@ class ClientScreen extends ConsumerWidget {
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(top: 16.0),
+
+                          /// Button to send the clipboard text to the client.
                           child: FilledButton(
                             onPressed: () async {
                               try {
@@ -123,7 +127,6 @@ class ClientScreen extends ConsumerWidget {
                               }
                             },
                             child: Row(
-                              // mainAxisSize: MainAxisSize.min,
                               children: [
                                 const Icon(Icons.paste),
                                 SizedBox(width: 8),
@@ -134,6 +137,8 @@ class ClientScreen extends ConsumerWidget {
                         ),
                         Padding(
                           padding: const EdgeInsets.only(top: 16.0),
+
+                          /// Button to send a file to the client.
                           child: UploadButton(client: client),
                         ),
                       ],

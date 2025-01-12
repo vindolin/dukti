@@ -24,13 +24,14 @@ class EmptyClipboardException implements Exception {}
 
 class ClipboardException implements Exception {}
 
+/// Sends the clipboard data to the client
 sendClipboard(DuktiClient client) async {
   final clipboardData = await Clipboard.getData('text/plain');
   // logger.e('Clipboard data: ${clipboardData?.text}');
   if (clipboardData != null && clipboardData.text != null) {
     try {
       // final response = await Dio().post(
-      final response = await createDio('https://${client.host}:${client.port}').post(
+      final response = await createDio('https://${client.ip}:${client.port}').post(
         '/clipboard',
         data: {'text': clipboardData.text},
       );
